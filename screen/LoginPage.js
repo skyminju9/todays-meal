@@ -12,6 +12,13 @@ function LoginPage(){
 
 
     const handleLogin = async () => {
+        // Check if both username (id) and password are provided
+        if (!id || !pw) {
+            // Show an error message or handle it as needed
+            setLoginStatus("failure");
+            return;
+        }
+    
         try {
             const response = await fetch('http://ceprj.gachon.ac.kr:60022/login', {
                 method: 'POST',
