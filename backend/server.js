@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 
 const app = express();
 const PORT = process.env.PORT || 60022; 
-const bcrypt = require('bcrypt');
+
 
 app.use(json());
 
