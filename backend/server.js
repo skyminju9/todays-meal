@@ -1,4 +1,4 @@
-import express from 'express';
+import {express} from 'express';
 import { json } from 'body-parser';
 import { createPool } from 'mariadb';
 
