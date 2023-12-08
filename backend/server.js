@@ -48,23 +48,29 @@ app.post('/login', async (req, res) => {
 // Signup endpoint
 app.post('/signup', async (req, res) => {
     const { name, userid, password, pushNotificationSetting } = req.body;
-  
+
     try {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const conn = await pool.getConnection();
-      await conn.query(
-        'INSERT INTO Users (name, userid, password, pushNotificationSetting) VALUES (?, ?, ?, ?)',
-        [name, userid, hashedPassword, pushNotificationSetting === undefined ? true : pushNotificationSetting]
-      );
-      conn.release();
-  
-      res.status(201).json({ success: true, message: 'Signup successful' });
+        // Check if the user with the given userid already exists
+        const existingUser = await pool.query('SELECT * FROM Users WHERE userid = ?', [userid]);
+
+        if (existingUser.length > 0) {
+            // User with the given userid already exists
+            res.status(409).json({ success: false, message: 'User with this ID already exists' });
+            return;
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const conn = await pool.getConnection();
+        await conn.query(
+            'INSERT INTO Users (name, userid, password, pushNotificationSetting) VALUES (?, ?, ?, ?)',
+            [name, userid, hashedPassword, pushNotificationSetting === undefined ? true : pushNotificationSetting]
+        );
+        conn.release();
+
+        res.status(201).json({ success: true, message: 'Signup successful' });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, message: 'Internal server error' });
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
-  
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+
