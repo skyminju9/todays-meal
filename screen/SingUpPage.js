@@ -15,12 +15,19 @@ function SignUpPage(){
 
 
     const handleSignup = async () => {
-        try {
-          // Check if passwords match
-          if (pw !== checkPw) {
+
+        if (!name || !id || !pw || !checkPw) {
+            setSignupStatus("emptyFields");
+            return;
+        }
+    
+        // Check if passwords match
+        if (pw !== checkPw) {
             setSignupStatus("passwordMismatch");
             return;
-          }
+        }
+
+        try {
       
           const response = await fetch('http://ceprj.gachon.ac.kr:60022/signup', {
             method: 'POST',

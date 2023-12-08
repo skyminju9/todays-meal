@@ -49,6 +49,11 @@ app.post('/login', async (req, res) => {
 app.post('/signup', async (req, res) => {
     const { name, userid, password, pushNotificationSetting } = req.body;
 
+    if (!name || !userid || !password) {
+      res.status(400).json({ success: false, message: 'Name, userid, and password are required fields' });
+      return;
+    }
+
     try {
         // Check if the user with the given userid already exists
         const existingUser = await pool.query('SELECT * FROM Users WHERE userid = ?', [userid]);
