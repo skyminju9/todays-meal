@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "859542196164",
+    "project_id": "todaysmeal-f20fe",
+    "storage_bucket": "todaysmeal-f20fe.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:859542196164:android:4bbcd9d1c0082725f4de91",
+        "android_client_info": {
+          "package_name": "com.todaysmeal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkazO9WdwNnMgB7KxHCY-nWF_nuAU8eAk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
