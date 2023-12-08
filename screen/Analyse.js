@@ -11,33 +11,28 @@ const typeOfFood = [
     {id:2, txt:'양식', isChecked:false},
     {id:3, txt:'일식', isChecked:false},
     {id:4, txt:'중식', isChecked:false},
+    {id:5, txt:'채식', isChecked:false},
 ];
 
 const data = [
-    {id:5, txt:'닭고기', isChecked:false},
-    {id:6, txt:'돼지고기', isChecked:false},
-    {id:7, txt:'쇠고기', isChecked:false},
-    {id:8, txt:'애호박', isChecked:false},
-    {id:9, txt:'양배추', isChecked:false},
-    {id:10, txt:'가지', isChecked:false},
-    {id:11, txt:'당근', isChecked:false},
-    {id:12, txt:'오이', isChecked:false},
-    {id:13, txt:'감자', isChecked:false},
-    {id:14, txt:'고구마', isChecked:false},
-    {id:15, txt:'두부', isChecked:false},
-    {id:16, txt:'토마토', isChecked:false},
-    {id:17, txt:'레몬', isChecked:false},
-    {id:18, txt:'딸기', isChecked:false},
-    {id:19, txt:'치즈', isChecked:false},
+    {id:6, txt:'닭고기', isChecked:false},
+    {id:7, txt:'돼지고기', isChecked:false},
+    {id:8, txt:'쇠고기', isChecked:false},
+    {id:9, txt:'애호박', isChecked:false},
+    {id:10, txt:'양배추', isChecked:false},
+    {id:11, txt:'가지', isChecked:false},
+    {id:12, txt:'당근', isChecked:false},
+    {id:13, txt:'오이', isChecked:false},
+    {id:14, txt:'감자', isChecked:false},
+    {id:15, txt:'고구마', isChecked:false},
+    {id:16, txt:'두부', isChecked:false},
+    {id:17, txt:'토마토', isChecked:false},
+    {id:18, txt:'레몬', isChecked:false},
+    {id:19, txt:'딸기', isChecked:false},
+    {id:20, txt:'치즈', isChecked:false},
 
 ];
 
-const diet = [
-    {id:20, txt:'저탄수화물', isChecked:false},
-    {id:21, txt:'저지방', isChecked:false},
-    {id:22, txt:'비건식', isChecked:false},
-    {id:23, txt:'다이어트', isChecked:false},
-]
 
 function Analyse(){
 
@@ -99,21 +94,14 @@ function Analyse(){
                             />
                         </View>
                     ))}
-                    <Text style={styles.text}>STEP 3. 선호 식단 </Text>
-                    {diet.map((item) => (
-                        <View key={item.id} style={styles.checkboxContainer}>
-                            <CheckBox
-                                title={item.txt}
-                                checked={selectedItems.includes(item.id)}
-                                onPress={() => handleCheckboxChange(item.id)}
-                                containerStyle={styles.checkboxContainerStyle}
-                            />
-                        </View>
-                    ))}
+                    
                 </View>
                 
                 <View style={styles.buttonContainer}>
-                    <Pressable style={styles.button} onPress={handleSubmit}>
+                    <Pressable style={styles.button} onPress={()=>{
+                        handleSubmit();
+                        navigation.navigate('Recipe');
+                    }}>
                         <Text style={styles.buttonText}>제출하기</Text>
                     </Pressable>
                 </View>
@@ -130,9 +118,6 @@ const styles = StyleSheet.create({
         //alignItems: 'flex-start',
         margin:0,
         backgroundColor: '#ffffff',
-    },
-    space:{
-        padding:20,
     },
     text:{
 
@@ -182,6 +167,7 @@ const styles = StyleSheet.create({
         borderWidth: 0,
         padding: 0,
         margin: 0,
+        
     },
     buttonContainer:{
         position:'absolute',
