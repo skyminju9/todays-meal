@@ -1,13 +1,13 @@
-import express from 'express';
-//import { json } from 'body-parser';
+import express, { json } from 'express';
+//const { json } = require('body-parser');
 import { createPool } from 'mariadb';
-import bcrypt from 'bcrypt';
+import { hash } from 'bcrypt';
 
 const app = express();
 const PORT = process.env.PORT || 60022; 
 
 
-app.use(express.json());
+app.use(json());
 
 // Database connection pool setup
 const pool = createPool({
@@ -59,7 +59,7 @@ app.post('/signup', async (req, res) => {
             return;
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await hash(password, 10);
         const conn = await pool.getConnection();
         await conn.query(
             'INSERT INTO Users (name, userid, password, pushNotificationSetting) VALUES (?, ?, ?, ?)',
