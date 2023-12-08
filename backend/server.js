@@ -1,5 +1,5 @@
 import express from 'express';
-import { json } from 'body-parser';
+//import { json } from 'body-parser';
 import { createPool } from 'mariadb';
 import bcrypt from 'bcrypt';
 
@@ -7,7 +7,7 @@ const app = express();
 const PORT = process.env.PORT || 60022; 
 
 
-app.use(json());
+app.use(express.json());
 
 // Database connection pool setup
 const pool = createPool({
