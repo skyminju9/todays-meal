@@ -18,6 +18,10 @@ const pool = createPool({
   connectionLimit: 5,
 });
 
+app.get('/', (req, res) => {
+    res.send('Hello from the backend!'); // 루트 경로로 요청이 왔을 때 "Hello from the backend!"를 응답으로 보냅니다.
+});
+
 // Login endpoint
 app.post('/login', async (req, res) => {
     const { userid, password } = req.body;
