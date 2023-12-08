@@ -11,6 +11,43 @@ function SignUpPage(){
     const [id, setId] = useState("");
     const [pw, setPw] = useState("");
     const [checkPw, setCheckPw] = useState("");
+    const [signupStatus, setSignupStatus] = useState(null);
+
+
+    const handleSignup = async () => {
+        try {
+            // Check if passwords match
+            if (pw !== checkPw) {
+                setSignupStatus("passwordMismatch");
+                return;
+            }
+
+            const response = await fetch('http://ceprj.gachon.ac.kr:60022/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, username: id, password: pw }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Handle successful signup
+                setSignupStatus("success");
+                // Navigate to the 'Analyse' page
+                navigation.navigate('Analyse');
+                // You may want to store some user information in AsyncStorage or Redux here
+                // Example: AsyncStorage.setItem('token', data.token);
+            } else {
+                // Handle signup failure
+                setSignupStatus("failure");
+            }
+        } catch (error) {
+            console.error(error);
+            setSignupStatus("error");
+        }
+    };
 
     return(
         <View style={styles.container}>
@@ -54,10 +91,22 @@ function SignUpPage(){
                 placeholder="비밀번호 확인"/>
             </View>
             <View style={styles.buttonContainer}>
-                <Pressable style = {styles.button} onPress={()=>navigation.navigate('Analyse')}>
+                <Pressable style = {styles.button} onPress={handleSignup}>
                     <Text style={styles.buttonText}>회원가입</Text>
                 </Pressable>
             </View>
+            {signupStatus === "success" && (
+                <Text style={{ color: 'green', marginTop: 20 }}>회원가입 성공! Analyse 페이지로 이동합니다.</Text>
+            )}
+            {signupStatus === "failure" && (
+                <Text style={{ color: 'red', marginTop: 20 }}>회원가입 실패. 다시 시도하세요.</Text>
+            )}
+            {signupStatus === "passwordMismatch" && (
+                <Text style={{ color: 'red', marginTop: 20 }}>비밀번호가 일치하지 않습니다. 다시 확인하세요.</Text>
+            )}
+            {signupStatus === "error" && (
+                <Text style={{ color: 'red', marginTop: 20 }}>오류가 발생했습니다. 나중에 다시 시도하세요.</Text>
+            )}
         </View>
     );
 };
