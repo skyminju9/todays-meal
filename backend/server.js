@@ -1,5 +1,3 @@
-"use strict";
-
 import express from 'express';
 import { json } from 'body-parser';
 import { createPool } from 'mariadb';
