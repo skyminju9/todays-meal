@@ -20,38 +20,38 @@ const pool = createPool({
 
 // Login endpoint
 app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-
-  try {
-    const conn = await pool.getConnection();
-    const result = await conn.query(
-      'SELECT * FROM Users WHERE Username = ? AND Password = ?',
-      [username, password]
-    );
-    conn.release();
-
-    if (result.length > 0) {
-      res.status(200).json({ success: true, message: 'Login successful' });
-    } else {
-      res.status(401).json({ success: false, message: 'Invalid credentials' });
+    const { userid, password } = req.body;
+  
+    try {
+      const conn = await pool.getConnection();
+      const result = await conn.query(
+        'SELECT * FROM Users WHERE userid = ? AND password = ?',
+        [userid, password]
+      );
+      conn.release();
+  
+      if (result.length > 0) {
+        res.status(200).json({ success: true, message: 'Login successful' });
+      } else {
+        res.status(401).json({ success: false, message: 'Invalid credentials' });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: 'Internal server error' });
     }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
-  }
-});
+  });
 
 // Signup endpoint
 app.post('/signup', async (req, res) => {
-    const { username, password } = req.body;
+    const { name, userid, password, pushNotificationSetting } = req.body;
   
     try {
-      const hashedPassword = await bcrypt.hash(password, 10); // 10 is the saltRounds
+      const hashedPassword = await bcrypt.hash(password, 10);
       const conn = await pool.getConnection();
-      await conn.query('INSERT INTO Users (Username, Password) VALUES (?, ?)', [
-        username,
-        hashedPassword,
-      ]);
+      await conn.query(
+        'INSERT INTO Users (name, userid, password, pushNotificationSetting) VALUES (?, ?, ?, ?)',
+        [name, userid, hashedPassword, pushNotificationSetting === undefined ? true : pushNotificationSetting]
+      );
       conn.release();
   
       res.status(201).json({ success: true, message: 'Signup successful' });
@@ -60,7 +60,7 @@ app.post('/signup', async (req, res) => {
       res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
-
+  
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });

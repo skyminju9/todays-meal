@@ -16,36 +16,41 @@ function SignUpPage(){
 
     const handleSignup = async () => {
         try {
-            // Check if passwords match
-            if (pw !== checkPw) {
-                setSignupStatus("passwordMismatch");
-                return;
-            }
-
-            const response = await fetch('http://ceprj.gachon.ac.kr:60022/signup', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ name, username: id, password: pw }),
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                // Handle successful signup
-                setSignupStatus("success");
-                // Navigate to the 'Analyse' page
-                navigation.navigate('Analyse');
-                // You may want to store some user information in AsyncStorage or Redux here
-                // Example: AsyncStorage.setItem('token', data.token);
-            } else {
-                // Handle signup failure
-                setSignupStatus("failure");
-            }
+          // Check if passwords match
+          if (pw !== checkPw) {
+            setSignupStatus("passwordMismatch");
+            return;
+          }
+      
+          const response = await fetch('http://ceprj.gachon.ac.kr:60022/signup', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              name,
+              userid: id,
+              password: pw,
+              pushNotificationSetting: true, // or false based on user preference
+            }),
+          });
+      
+          const data = await response.json();
+      
+          if (data.success) {
+            // Handle successful signup
+            setSignupStatus("success");
+            // Navigate to the 'Analyse' page
+            navigation.navigate('Analyse');
+            // You may want to store some user information in AsyncStorage or Redux here
+            // Example: AsyncStorage.setItem('token', data.token);
+          } else {
+            // Handle signup failure
+            setSignupStatus("failure");
+          }
         } catch (error) {
-            console.error(error);
-            setSignupStatus("error");
+          console.error(error);
+          setSignupStatus("error");
         }
     };
 
