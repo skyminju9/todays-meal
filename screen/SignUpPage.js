@@ -29,29 +29,30 @@ function SignUpPage(){
 
         try {
             
-            const response = await fetch('http://ceprj.gachon.ac.kr:60022/login', {
+            const response = await fetch('http://ceprj.gachon.ac.kr:60022/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ userid: id, password: pw }),
+                body: JSON.stringify({ name, userid: id, password: pw, pushNotificationSetting: true }),
             });
+
       
-          const data = await response.json();
+            const data = await response.json();
       
-          if (data.success) {
-            // Handle successful signup
-            setSignupStatus("success");
-            // Navigate to the 'Analyse' page
-            navigation.navigate('Analyse');
+            if (data.success) {
+                // Handle successful signup
+                setSignupStatus("success");
+                // Navigate to the 'Analyse' page
+                navigation.navigate('Analyse');
             
-          } else {
-            // Handle signup failure
-            setSignupStatus("failure");
-          }
+            } else {
+                // Handle signup failure
+                setSignupStatus("failure");
+            }
         } catch (error) {
-          console.error(error);
-          setSignupStatus("error");
+            console.error(error);
+            setSignupStatus("error");
         }
     };
 
