@@ -2,7 +2,7 @@ import express, { json } from 'express';
 //const { json } = require('body-parser');
 import { createPool } from 'mariadb';
 import { hash } from 'bcrypt';
-import {jwt} from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 const app = express();
 const PORT = process.env.PORT || 60022; 
