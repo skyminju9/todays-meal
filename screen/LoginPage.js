@@ -2,6 +2,7 @@ import React from "react";
 import {View, Image, StyleSheet, Text, Pressable, TextInput} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function LoginPage(){
     const navigation = useNavigation();
@@ -25,7 +26,7 @@ function LoginPage(){
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ username: id, password: pw }),
+                body: JSON.stringify({ userid: id, password: pw }),
             });
     
             const data = await response.json();
@@ -33,10 +34,9 @@ function LoginPage(){
             if (data.success) {
                 // Handle successful login
                 setLoginStatus("success");
-                // Navigate to the 'Recipe' page
+                await AsyncStorage.setItem('token', data.token);
                 navigation.navigate('Recipe');
-                // You may want to store some user information in AsyncStorage or Redux here
-                // Example: AsyncStorage.setItem('token', data.token);
+                
             } else {
                 // Handle login failure
                 setLoginStatus("failure");
