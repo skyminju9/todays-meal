@@ -70,36 +70,43 @@ app.post('/login', async (req, res) => {
 
 // Signup endpoint
 app.post('/signup', async (req, res) => {
-    const { name, userid, password, pushNotificationSetting } = req.body;
+  const { name, userid, password, pushNotificationSetting } = req.body;
 
-    if (!name || !userid || !password) {
-      res.status(400).json({ success: false, message: 'Name, userid, and password are required fields' });
-      return;
-    }
+  if (!name || !userid || !password) {
+    res.status(400).json({ success: false, message: 'Name, userid, and password are required fields' });
+    return;
+  }
 
-    try {
-        // Check if the user with the given userid already exists
-        const existingUser = await pool.query('SELECT * FROM Users WHERE userid = ?', [userid]);
+  try {
+      // Check if the user with the given userid already exists
+      const existingUser = await pool.query('SELECT * FROM Users WHERE userid = ?', [userid]);
 
-        if (existingUser.length > 0) {
-            // User with the given userid already exists
-            res.status(409).json({ success: false, message: 'User with this ID already exists' });
-            return;
-        }
+      if (existingUser.length > 0) {
+          // User with the given userid already exists
+          res.status(409).json({ success: false, message: 'User with this ID already exists' });
+          return;
+      }
 
-        const hashedPassword = await hash(password, 10);
-        const conn = await pool.getConnection();
-        await conn.query(
-          'INSERT INTO Users (name, userid, password, pushNotificationSetting) VALUES (?, ?, ?, ?)',
-          [name, userid, hashedPassword, pushNotificationSetting === undefined ? true : pushNotificationSetting, 1] // Set isLoggedIn to 1 for new signups
-        );
-        conn.release();
+      const hashedPassword = await hash(password, 10);
+      const conn = await pool.getConnection();
+      await conn.query(
+        'INSERT INTO Users (name, userid, password, pushNotificationSetting) VALUES (?, ?, ?, ?)',
+        [name, userid, hashedPassword, pushNotificationSetting === undefined ? true : pushNotificationSetting]
+      );
+      conn.release();
 
-        res.status(201).json({ success: true, message: 'Signup successful' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: 'Internal server error' });
-    }
+      const token = generateToken(userid);  // Generate token after successful signup
+
+      if (token) {
+        // Save the token in AsyncStorage only if it's available
+        await AsyncStorage.setItem('token', token);
+      }
+
+      res.status(201).json({ success: true, message: 'Signup successful' });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+  }
 });
 
 app.listen(PORT, () => {
