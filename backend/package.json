@@ -1,6 +1,6 @@
 {
   "name": "backend",
-  "type":"module",
+  "type": "module",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -62,6 +62,7 @@
     "inherits": "^2.0.4",
     "ipaddr.js": "^1.9.1",
     "is-fullwidth-code-point": "^3.0.0",
+    "jsonwebtoken": "^9.0.2",
     "lru-cache": "^6.0.0",
     "make-dir": "^3.1.0",
     "mariadb": "^3.2.2",
