@@ -3,6 +3,8 @@ import express, { json } from 'express';
 import { createPool } from 'mariadb';
 import { hash } from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const app = express();
 const PORT = process.env.PORT || 60022; 
