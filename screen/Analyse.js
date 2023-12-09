@@ -5,7 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 import { useState } from "react";
 import { CheckBox } from "react-native-elements";
 import { ScrollView } from "react-native-gesture-handler";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const typeOfFood = [
     {id:1, txt:'한식', isChecked:false},
@@ -48,12 +47,9 @@ function Analyse(){
         setSelectedItems(updatedItems);
     };
 
-    const handleSubmit = async () => {
-        // TODO: Fetch user preferences based on selectedItems and navigate accordingly
-        const token = await AsyncStorage.getItem('token');
-        console.log('User Token:', token);
-        navigation.navigate('Recipe'); // Navigate to the recipe recommendation page
-    };    
+    const handleSubmit = () => {
+        console.log("Selectd Items:", selectedItems);
+    }
     
     return(
         
@@ -104,6 +100,7 @@ function Analyse(){
                 <View style={styles.buttonContainer}>
                     <Pressable style={styles.button} onPress={()=>{
                         handleSubmit();
+                        navigation.navigate('Recipe');
                     }}>
                         <Text style={styles.buttonText}>제출하기</Text>
                     </Pressable>
