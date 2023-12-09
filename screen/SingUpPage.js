@@ -2,6 +2,7 @@ import React from "react";
 import {View, Image, StyleSheet, Text, Pressable, TextInput} from 'react-native';
 import { useNavigation } from '@react-navigation/native'; 
 import { useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function SignUpPage(){
 
@@ -47,14 +48,14 @@ function SignUpPage(){
           if (data.success) {
             // Handle successful signup
             setSignupStatus("success");
+            // Store user information in AsyncStorage
+            await AsyncStorage.setItem('token', data.token);
             // Navigate to the 'Analyse' page
             navigation.navigate('Analyse');
-            // You may want to store some user information in AsyncStorage or Redux here
-            // Example: AsyncStorage.setItem('token', data.token);
-          } else {
-            // Handle signup failure
-            setSignupStatus("failure");
-          }
+            } else {
+                // Handle signup failure
+                setSignupStatus("failure");
+            }
         } catch (error) {
           console.error(error);
           setSignupStatus("error");
