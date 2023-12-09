@@ -49,8 +49,7 @@ function SignUpPage(){
             setSignupStatus("success");
             // Navigate to the 'Analyse' page
             navigation.navigate('Analyse');
-            // You may want to store some user information in AsyncStorage or Redux here
-            // Example: AsyncStorage.setItem('token', data.token);
+            
           } else {
             // Handle signup failure
             setSignupStatus("failure");
