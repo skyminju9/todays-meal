@@ -28,19 +28,14 @@ function SignUpPage(){
         }
 
         try {
-      
-          const response = await fetch('http://ceprj.gachon.ac.kr:60022/signup', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              name,
-              userid: id,
-              password: pw,
-              pushNotificationSetting: true, // or false based on user preference
-            }),
-          });
+            
+            const response = await fetch('http://ceprj.gachon.ac.kr:60022/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ userid: id, password: pw }),
+            });
       
           const data = await response.json();
       
