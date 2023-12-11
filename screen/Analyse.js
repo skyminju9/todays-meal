@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {Text, View, StyleSheet, Pressable} from "react-native";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import { useState } from "react";
 import { CheckBox } from "react-native-elements";
 import { ScrollView } from "react-native-gesture-handler";
+import axios from 'axios';
 
 const typeOfFood = [
     {id:1, txt:'한식', isChecked:false},
@@ -33,12 +34,31 @@ const data = [
 
 ];
 
+const getSessionUserName = async () => {
+
+    try{
+        const response = await axios.get('http://ceprj.gachon.ac.kr:60022/getUserName');
+        return response.data.userName;
+    }catch(error){
+        console.error('Error fetching user name:',error);
+        return null;
+    }
+};
+
 
 function Analyse(){
 
     const userIcon = <Icon name="user-circle" size={40} />;
     const navigation = useNavigation();
     const [selectedItems, setSelectedItems] = useState([]);
+    const [userName, setUserName] = useState(null);
+
+    useEffect(()=>{
+        const userNameFromSession = getSessionUserName();
+        if(userNameFromSession){
+            setUserName(userNameFromSession);
+        }
+    },[]);
     
     const handleCheckboxChange = (id) => {
         const updatedItems = selectedItems.includes(id)
@@ -63,7 +83,7 @@ function Analyse(){
                         레시피 추천을 위해
                     </Text>
                     <Text style = {styles.title}>
-                        username님의 취향을
+                        {userName}님의 취향을
                     </Text>
                     <Text style = {styles.title}>
                         파악하는 중입니다...
