@@ -90,12 +90,26 @@ app.post('/signup', async (req, res) => {
       conn.release();
 
       // Create a session for the new user
-      req.session.user = { userid };
+      req.session.user = { name, userid };
 
       res.status(201).json({ success: true, message: 'Signup successful' });
   } catch (error) {
       console.error(error);
       res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+app.get('/getUserName', (req, res)=>{
+  try{
+    const userName = req.session.user && req.session.user.name;
+    if(userName){
+      res.status(200).json({userName});
+    }else{
+      res.status(404).json({error:'User name not found'});
+    }
+  }catch(error){
+    console.error('Error getting user name : ', error);
+    res.status(500).json({error:'Internal server error'});
   }
 });
 
