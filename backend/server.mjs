@@ -46,8 +46,7 @@ app.post('/login', async (req, res) => {
 
       if (passwordMatch) {
         // Save only user ID in the session
-        req.session.user = { userid: user.userid };
-
+        req.session.user = { userid: user.userid, userName: user.name };
         res.status(200).json({ success: true, message: 'Login successful' });
       } else {
         res.status(401).json({ success: false, message: 'Invalid credentials' });

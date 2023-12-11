@@ -10,9 +10,10 @@ const getSessionUserName = async () => {
 
   try{
       const response = await axios.get('http://ceprj.gachon.ac.kr:60022/getUserName');
+      console.log('Server response:', response.data);
       return response.data.userName;
   }catch(error){
-      console.error('Error fetching user name:',error);
+      console.error('Error fetching user name:',error.message);
       return null;
   }
 };

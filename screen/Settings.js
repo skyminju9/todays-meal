@@ -15,7 +15,7 @@ const getSessionUserName = async () => {
       const response = await axios.get('http://ceprj.gachon.ac.kr:60022/getUserName');
       return response.data.userName;
   }catch(error){
-      console.error('Error fetching user name:',error);
+      console.error('Error fetching user name:',error.message);
       return null;
   }
 };
@@ -25,6 +25,18 @@ function Settings() {
     const [userName, setUserName] = useState(null);
     const userIcon = <Icon name="user-circle" size={40} />;
     const rightIcon = <Icon2 name="right" size={20} />;
+
+    
+    const fetchUserName = async () => {
+      try {
+        const userNameFromSession = await getSessionUserName();
+        if (userNameFromSession) {
+          setUserName(userNameFromSession);
+        }
+      } catch (error) {
+        console.error('Error fetching user name:', error);
+      }
+    };
 
     const handleLogout = async () => {
       try {
@@ -36,6 +48,7 @@ function Settings() {
           // 세션 정보 클리어
           clearSession();
           setUserName(null);
+          fetchUserName();
           navigation.navigate('Login');
         } else {
           console.error('로그아웃 실패', data.message);
@@ -53,24 +66,9 @@ function Settings() {
     };
 
     useEffect(() => {
-      const fetchUserName = async () => {
-          try {
-              const userNameFromSession = await getSessionUserName();
-              if (userNameFromSession) {
-                  setUserName(userNameFromSession);
-              }
-          } catch (error) {
-              console.error('Error fetching user name:', error);
-          }
-      };
-  
       fetchUserName();
     }, []);
-  
 
-    
-    
-  
     return (
       <View style={styles.container}>
         <View style={styles.imageContainer}>
