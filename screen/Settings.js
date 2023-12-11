@@ -50,7 +50,7 @@ function Settings() {
           clearSession();
           setUserName(null);
           fetchUserName();
-          navigation.navigate('Login');
+          navigation.navigate('Home');
         } else {
           console.error('로그아웃 실패', data.message);
           // 실패 시에 대한 처리
