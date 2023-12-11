@@ -4,7 +4,18 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon2 from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 import recipes from "../recipes.json";
+import axios from "axios";
 
+const getSessionUserName = async () => {
+
+  try{
+      const response = await axios.get('http://ceprj.gachon.ac.kr:60022/getUserName');
+      return response.data.userName;
+  }catch(error){
+      console.error('Error fetching user name:',error);
+      return null;
+  }
+};
 
 function Recipe() {
   const userIcon = <Icon name="user-circle" size={40} />;
@@ -49,7 +60,16 @@ function Recipe() {
   return (
     <ScrollView style={styles.scrollView}>
         <View style={styles.container}>
-            <Pressable style={styles.usericonContainer} onPress={() => navigation.navigate('Settings')}>
+            <Pressable style={styles.usericonContainer} onPress={async () => {
+                // 사용자 정보를 세션에 설정
+                const userName = await getSessionUserName();
+                if (userName) {
+                    navigation.navigate('Settings');
+                } else {
+                    // 사용자 정보가 없을 경우 예외 처리
+                    console.error('User information not found.');
+                }
+            }}>
                 {userIcon}
             </Pressable>
             <View style={styles.titleContainer}>

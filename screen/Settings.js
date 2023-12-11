@@ -9,7 +9,16 @@ import { ScrollView } from "react-native-gesture-handler";
 import axios from "axios";
 import { FadeInLeft } from "react-native-reanimated";
 
+const getSessionUserName = async () => {
 
+  try{
+      const response = await axios.get('http://ceprj.gachon.ac.kr:60022/getUserName');
+      return response.data.userName;
+  }catch(error){
+      console.error('Error fetching user name:',error);
+      return null;
+  }
+};
 
 function Settings() {
     const navigation = useNavigation();
@@ -45,22 +54,21 @@ function Settings() {
 
     useEffect(() => {
       const fetchUserName = async () => {
-        try {
-          const response = await axios.get('http://ceprj.gachon.ac.kr:60022/getUserName');
-          const data = response.data;
-    
-          if (data.userName) {
-            setUserName(data.userName);
-          } else {
-            console.error('사용자 이름을 가져오는데 실패했습니다.');
+          try {
+              const userNameFromSession = await getSessionUserName();
+              if (userNameFromSession) {
+                  setUserName(userNameFromSession);
+              }
+          } catch (error) {
+              console.error('Error fetching user name:', error);
           }
-        } catch (error) {
-          console.error('사용자 이름을 가져오는 도중 오류 발생:', error);
-        }
       };
-    
+  
       fetchUserName();
     }, []);
+  
+
+    
     
   
     return (
@@ -75,7 +83,7 @@ function Settings() {
         </View>
         <View style={styles.usernameContainer}>
           {userIcon}
-          <Text style={styles.username}>username</Text>
+          <Text style={styles.username}>{userName}</Text>
         </View>
         <View style={styles.listsContainer}>
           <View style={styles.elementContainer}>
