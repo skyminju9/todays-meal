@@ -13,9 +13,10 @@ const getSessionUserName = async () => {
 
   try{
       const response = await axios.get('http://ceprj.gachon.ac.kr:60022/getUserName');
+      //console.log('Server response:', response.data);
       return response.data.userName;
   }catch(error){
-      console.error('Error fetching user name:',error.message);
+      console.error('Error fetching user name:',error);
       return null;
   }
 };
@@ -66,8 +67,19 @@ function Settings() {
     };
 
     useEffect(() => {
+      const fetchUserName = async () => {
+        try {
+          const userNameFromSession = await getSessionUserName();
+          if (userNameFromSession) {
+            setUserName(userNameFromSession);
+          }
+        } catch (error) {
+          console.error('Error fetching user name:', error);
+        }
+      };
+    
       fetchUserName();
-    }, []);
+    }, [userName]);
 
     return (
       <View style={styles.container}>

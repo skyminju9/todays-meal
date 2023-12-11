@@ -35,12 +35,12 @@ const data = [
 ];
 
 const getSessionUserName = async () => {
-
-    try{
+    try {
         const response = await axios.get('http://ceprj.gachon.ac.kr:60022/getUserName');
+        // console.log('Server response:', response.data); // 주석 처리 또는 제거
         return response.data.userName;
-    }catch(error){
-        console.error('Error fetching user name:',error);
+    } catch (error) {
+        console.error('Error fetching user name:', error.message);
         return null;
     }
 };
@@ -66,9 +66,8 @@ function Analyse(){
         };
     
         fetchUserName();
-    }, []);
-    
-    
+    }, []); 
+
     const handleCheckboxChange = (id) => {
         const updatedItems = selectedItems.includes(id)
             ? selectedItems.filter((item)=>item!==id)

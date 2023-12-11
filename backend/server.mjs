@@ -61,6 +61,7 @@ app.post('/login', async (req, res) => {
 });
 
 
+
 // Signup endpoint
 app.post('/signup', async (req, res) => {
   const { name, userid, password, pushNotificationSetting } = req.body;
@@ -100,17 +101,18 @@ app.post('/signup', async (req, res) => {
 
 app.get('/getUserName', (req, res) => {
   try {
-    const userName = req.session.user && req.session.user.name;
+    const userName = req.session.user && req.session.user.userName;
     if (userName) {
       res.status(200).json({ userName });
     } else {
-      res.status(200).json({ userName: null }); // 수정된 부분
+      res.status(200).json({ userName: null });
     }
   } catch (error) {
     console.error('Error getting user name:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 // Logout endpoint
