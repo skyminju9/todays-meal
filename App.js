@@ -5,6 +5,7 @@ import SignUpPage from './screen/SignUpPage';
 import Analyse from './screen/Analyse';
 import Settings from './screen/Settings';
 import Recipe from './screen/Recipe';
+import Bookmark from './screen/Bookmark';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { StyleSheet, Image, Text, View, Pressable, SafeAreaView } from 'react-native';
@@ -26,6 +27,7 @@ const App = () => {
           <Stack.Screen name = "Analyse" component={Analyse}/>
           <Stack.Screen name = "Settings" component={Settings}/>
           <Stack.Screen name = "Recipe" component={Recipe}/>
+          <Stack.Screen name = "Bookmark" component={Bookmark}/>
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>

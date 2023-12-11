@@ -113,6 +113,24 @@ app.get('/getUserName', (req, res)=>{
   }
 });
 
+// Logout endpoint
+app.post('/logout', (req, res) => {
+  try {
+      // 세션 정보 클리어
+      req.session.destroy((err) => {
+          if (err) {
+              console.error('세션 클리어 실패:', err);
+              res.status(500).json({ success: false, message: 'Internal server error' });
+          } else {
+              res.status(200).json({ success: true, message: 'Logout successful' });
+          }
+      });
+  } catch (error) {
+      console.error('로그아웃 중 오류 발생:', error);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
