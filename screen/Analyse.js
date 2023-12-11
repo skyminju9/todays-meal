@@ -53,12 +53,21 @@ function Analyse(){
     const [selectedItems, setSelectedItems] = useState([]);
     const [userName, setUserName] = useState(null);
 
-    useEffect(()=>{
-        const userNameFromSession = getSessionUserName();
-        if(userNameFromSession){
-            setUserName(userNameFromSession);
-        }
-    },[]);
+    useEffect(() => {
+        const fetchUserName = async () => {
+            try {
+                const userNameFromSession = await getSessionUserName();
+                if (userNameFromSession) {
+                    setUserName(userNameFromSession);
+                }
+            } catch (error) {
+                console.error('Error fetching user name:', error);
+            }
+        };
+    
+        fetchUserName();
+    }, []);
+    
     
     const handleCheckboxChange = (id) => {
         const updatedItems = selectedItems.includes(id)
@@ -68,7 +77,7 @@ function Analyse(){
     };
 
     const handleSubmit = () => {
-        console.log("Selectd Items:", selectedItems);
+        console.log("Selected Items:", selectedItems);
     }
     
     return(
