@@ -33,7 +33,7 @@ const data = [
   { id: 20, txt: '치즈', isChecked: false },
 ];
 
-const getSessionUserName = async (userId) => {
+const getSessionUserName = async (userid) => {
   try {
     const response = await axios.get('http://ceprj.gachon.ac.kr:60022/getUserName');
     return response.data.userName;
@@ -47,14 +47,14 @@ function Analyse({ route }) {
   const userIcon = <Icon name="user-circle" size={40} />;
   const navigation = useNavigation();
   const [selectedItems, setSelectedItems] = useState([]);
-  const { userName, userId } = route.params;
+  const { userName, userid } = route.params;
 
   const handleSubmit = async () => {
     try {
       const response = await axios.post(
         'http://ceprj.gachon.ac.kr:60022/saveUserSelections',
         {
-          userId: userId, // Updated key to match the server-side parameter name
+          userid: userid,
           selectedTypeOfFood: selectedItems.filter((id) => id <= 5).map(id => typeOfFood.find(item => item.id === id).txt),
           selectedData: selectedItems.filter((id) => id > 5).map(id => data.find(item => item.id === id).txt),
         }
@@ -128,6 +128,7 @@ function Analyse({ route }) {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
     container: {
