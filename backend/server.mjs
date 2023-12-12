@@ -114,8 +114,6 @@ app.get('/getUserName', (req, res) => {
   }
 });
 
-
-
 // Logout endpoint
 app.post('/logout', (req, res) => {
     try {
@@ -134,22 +132,19 @@ app.post('/logout', (req, res) => {
     }
 });
 
-// Save user selections endpoint
 app.post('/saveUserSelections', async (req, res) => {
+  const { userId, selectedTypeOfFood, selectedData } = req.body;
+
   try {
-      const { userid, selectedItems } = req.body;
-
       const conn = await pool.getConnection();
+      await conn.query('DELETE FROM UserSelections WHERE userid = ?', [userId]);
 
-      // Loop through selectedItems and update UserSelections table accordingly
-      for (const itemId of selectedItems) {
-          const typeOfFoodResult = await conn.query(
-              'INSERT INTO UserSelections (userid, typeId, isTypeSelected) VALUES (?, ?, TRUE) ' +
-              'ON DUPLICATE KEY UPDATE isTypeSelected = TRUE',
-              [userid, itemId]
-          );
-          
-          // Update Data table similarly if needed
+      for (const typeId of selectedTypeOfFood) {
+          await conn.query('INSERT INTO UserSelections (userid, typeId, isSelected) VALUES (?, ?, true)', [userid, typeId]);
+      }
+
+      for (const dataId of selectedData) {
+          await conn.query('INSERT INTO UserSelections (userid, dataId, isSelected) VALUES (?, ?, true)', [userid, dataId]);
       }
 
       conn.release();
@@ -160,6 +155,7 @@ app.post('/saveUserSelections', async (req, res) => {
       res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
+
 
 
 
