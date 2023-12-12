@@ -62,7 +62,7 @@ function Analyse({ route }) {
 
       console.log('Server response:', response.data);
 
-      navigation.navigate('Recipe');
+      navigation.navigate('LoginPage');
     } catch (error) {
       console.error('Error saving user selections:', error.message);
     }
