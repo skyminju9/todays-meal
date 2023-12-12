@@ -144,10 +144,12 @@ app.post('/saveUserSelections', async (req, res) => {
       // Loop through selectedItems and update UserSelections table accordingly
       for (const itemId of selectedItems) {
           const typeOfFoodResult = await conn.query(
-              'INSERT INTO UserSelections (userid, typeId, isTypeChecked) VALUES (?, ?, TRUE)',
+              'INSERT INTO UserSelections (userid, typeId, isTypeSelected) VALUES (?, ?, TRUE) ' +
+              'ON DUPLICATE KEY UPDATE isTypeSelected = TRUE',
               [userid, itemId]
           );
-          // Handle Data table similarly if needed
+          
+          // Update Data table similarly if needed
       }
 
       conn.release();
@@ -158,6 +160,7 @@ app.post('/saveUserSelections', async (req, res) => {
       res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
+
 
 
 app.listen(PORT, () => {

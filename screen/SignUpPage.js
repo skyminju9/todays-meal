@@ -44,7 +44,7 @@ function SignUpPage(){
                 // Handle successful signup
                 setSignupStatus("success");
                 // Navigate to the 'Analyse' page
-                navigation.navigate('Analyse');
+                navigation.navigate('Analyse', {userName:name, userId:id});
             
             } else {
                 // Handle signup failure
