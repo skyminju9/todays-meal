@@ -139,15 +139,11 @@ app.post('/saveUserSelections', async (req, res) => {
     // Clear previous selections for the user
     await conn.query('DELETE FROM UserSelections WHERE userid = ?', [userid]);
 
-    // Insert new selections for typeOfFood
-    for (const type of selectedTypeOfFood) {
-      await conn.query('INSERT INTO UserSelections (userid, typeOfFood, selectedData) VALUES (?, ?, ?)', [userid, type, null]);
-    }
+    // Insert new selections as comma-separated strings
+    const typeOfFoodString = selectedTypeOfFood.join(', ');
+    const selectedDataString = selectedData.join(', ');
 
-    // Insert new selections for selectedData
-    for (const data of selectedData) {
-      await conn.query('INSERT INTO UserSelections (userid, typeOfFood, selectedData) VALUES (?, ?, ?)', [userid, null, data]);
-    }
+    await conn.query('INSERT INTO UserSelections (userid, typeOfFood, selectedData) VALUES (?, ?, ?)', [userid, typeOfFoodString, selectedDataString]);
 
     conn.release();
 
@@ -157,6 +153,7 @@ app.post('/saveUserSelections', async (req, res) => {
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
+
 
 
 app.listen(PORT, () => {
