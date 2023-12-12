@@ -61,8 +61,6 @@ app.post('/login', async (req, res) => {
   }
 });
 
-
-
 // Signup endpoint
 app.post('/signup', async (req, res) => {
   const { name, userid, password, pushNotificationSetting } = req.body;
@@ -133,21 +131,22 @@ app.post('/logout', (req, res) => {
 });
 
 app.post('/saveUserSelections', async (req, res) => {
-  const { userId, selectedTypeOfFood, selectedData } = req.body;
+  const { userid, selectedTypeOfFood, selectedData } = req.body;
 
   try {
     const conn = await pool.getConnection();
 
     // Clear previous selections for the user
-    await conn.query('DELETE FROM UserSelections WHERE userid = ?', [userId]);
+    await conn.query('DELETE FROM UserSelections WHERE userid = ?', [userid]);
 
-    // Insert new selections
-    for (const typeId of selectedTypeOfFood) {
-      await conn.query('INSERT INTO UserSelections (userid, foodType, isSelected) VALUES (?, ?, true)', [userId, typeOfFood.find(item => item.id === typeId).txt]);
+    // Insert new selections for typeOfFood
+    for (const type of selectedTypeOfFood) {
+      await conn.query('INSERT INTO UserSelections (userid, typeOfFood, selectedData) VALUES (?, ?, ?)', [userid, type, null]);
     }
 
-    for (const dataId of selectedData) {
-      await conn.query('INSERT INTO UserSelections (userid, ingredient, isSelected) VALUES (?, ?, true)', [userId, data.find(item => item.id === dataId).txt]);
+    // Insert new selections for selectedData
+    for (const data of selectedData) {
+      await conn.query('INSERT INTO UserSelections (userid, typeOfFood, selectedData) VALUES (?, ?, ?)', [userid, null, data]);
     }
 
     conn.release();
@@ -158,7 +157,6 @@ app.post('/saveUserSelections', async (req, res) => {
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
-
 
 
 app.listen(PORT, () => {
