@@ -140,11 +140,11 @@ app.post('/saveUserSelections', async (req, res) => {
       await conn.query('DELETE FROM UserSelections WHERE userid = ?', [userId]);
 
       for (const typeId of selectedTypeOfFood) {
-          await conn.query('INSERT INTO UserSelections (userid, typeId, isSelected) VALUES (?, ?, true)', [userid, typeId]);
+          await conn.query('INSERT INTO UserSelections (userid, typeId, isSelected) VALUES (?, ?, true)', [userId, typeId]);
       }
 
       for (const dataId of selectedData) {
-          await conn.query('INSERT INTO UserSelections (userid, dataId, isSelected) VALUES (?, ?, true)', [userid, dataId]);
+          await conn.query('INSERT INTO UserSelections (userid, dataId, isSelected) VALUES (?, ?, true)', [userId, dataId]);
       }
 
       conn.release();
