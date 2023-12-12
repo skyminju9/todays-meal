@@ -133,11 +133,11 @@ app.post('/logout', (req, res) => {
 });
 
 app.post('/saveUserSelections', async (req, res) => {
-  const { userId, selectedTypeOfFood, selectedData } = req.body;
+  const { userid, selectedTypeOfFood, selectedData } = req.body;
 
   try {
       const conn = await pool.getConnection();
-      await conn.query('DELETE FROM UserSelections WHERE userid = ?', [userId]);
+      await conn.query('DELETE FROM UserSelections WHERE userid = ?', [userid]);
 
       for (const typeId of selectedTypeOfFood) {
           await conn.query('INSERT INTO UserSelections (userid, typeId, isSelected) VALUES (?, ?, true)', [userid, typeId]);

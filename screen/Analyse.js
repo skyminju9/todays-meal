@@ -71,7 +71,7 @@ function Analyse({ route }) {
             const response = await axios.post(
                 'http://ceprj.gachon.ac.kr:60022/saveUserSelections',
                 {
-                    userId:userId,
+                    userid:userId,
                     selectedTypeOfFood: selectedItems.filter(id => id <= 5),
                     selectedData: selectedItems.filter(id => id > 5),
                 }
