@@ -12,7 +12,8 @@ app.use(json());
 app.use(session({
   secret:'secret-key',
   resave:false,
-  saveUninitialized: true,
+  saveUninitialized: false,
+  cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 },
 }));
 
 // Database connection pool setup
@@ -132,6 +133,32 @@ app.post('/logout', (req, res) => {
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
+
+// Save user selections endpoint
+app.post('/saveUserSelections', async (req, res) => {
+  try {
+      const { userid, selectedItems } = req.body;
+
+      const conn = await pool.getConnection();
+
+      // Loop through selectedItems and update UserSelections table accordingly
+      for (const itemId of selectedItems) {
+          const typeOfFoodResult = await conn.query(
+              'INSERT INTO UserSelections (userid, typeId, isTypeChecked) VALUES (?, ?, TRUE)',
+              [userid, itemId]
+          );
+          // Handle Data table similarly if needed
+      }
+
+      conn.release();
+
+      res.status(200).json({ success: true, message: 'User selections saved successfully' });
+  } catch (error) {
+      console.error('Error saving user selections:', error);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

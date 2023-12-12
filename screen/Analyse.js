@@ -75,9 +75,21 @@ function Analyse(){
         setSelectedItems(updatedItems);
     };
 
-    const handleSubmit = () => {
-        console.log("Selected Items:", selectedItems);
-    }
+    const handleSubmit = async () => {
+        try {
+            const response = await axios.post('http://ceprj.gachon.ac.kr:60022/saveUserSelections', {
+                userid: req.session.user.userid,
+                selectedItems: selectedItems
+            });
+    
+            console.log('Server response:', response.data);
+    
+            // Navigate to the Recipe screen or handle response as needed
+            navigation.navigate('Recipe');
+        } catch (error) {
+            console.error('Error saving user selections:', error.message);
+        }
+    };
     
     return(
         

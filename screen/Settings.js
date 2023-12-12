@@ -2,6 +2,7 @@ import React, {useEffect} from "react";
 import {Image, Text, View, StyleSheet, Pressable} from "react-native";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon2 from 'react-native-vector-icons/AntDesign';
+import Icon3 from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 import { useState } from "react";
 import { CheckBox } from "react-native-elements";
@@ -26,7 +27,13 @@ function Settings() {
     const [userName, setUserName] = useState(null);
     const userIcon = <Icon name="user-circle" size={40} />;
     const rightIcon = <Icon2 name="right" size={20} />;
-
+    const bell = <Icon3 name="bell" size={20} />;
+    const bellOff = <Icon3 name="bell-off" size={20} />;
+    const [isOn, setIsOn] = useState(true);
+    
+    const handlePress = () => {
+      setIsOn(!isOn);
+    };
     
     const fetchUserName = async () => {
       try {
@@ -50,7 +57,7 @@ function Settings() {
           clearSession();
           setUserName(null);
           fetchUserName();
-          navigation.navigate('Login');
+          navigation.navigate('Home');
         } else {
           console.error('로그아웃 실패', data.message);
           // 실패 시에 대한 처리
@@ -85,7 +92,7 @@ function Settings() {
       <View style={styles.container}>
         <View style={styles.imageContainer}>
           <Image source={require('../image/logo.png')} style={styles.image} />
-        </View>
+        </View> 
         <View style={styles.titleContainer}>
           <Text style={styles.title}>
             Settings
@@ -132,8 +139,8 @@ function Settings() {
             <Text style={styles.text}>
               푸시알림
             </Text>
-            <Pressable style={styles.icon}>
-              {rightIcon}
+            <Pressable style={styles.icon} onPress={handlePress}>
+              {isOn ? bell:bellOff}
             </Pressable>
           </View>
         </View>
@@ -178,12 +185,9 @@ const styles = StyleSheet.create({
     usernameContainer:{
       position:'absolute',
       top:200,
-      alignSelf:'center',
+      alignSelf:'left',
       flexDirection:'row',
-      borderWidth:1,
-      borderRadius:1,
-      borderStyle:'solid',
-      borderColor:'#858585',
+      
       paddingHorizontal:20,
       paddingRight:50,
       paddingVertical:15,
@@ -197,7 +201,7 @@ const styles = StyleSheet.create({
     listsContainer:{
       flexDirection:'column',
       position:'absolute',
-      top:350,
+      top:300,
       alignItems:'left',
       alignSelf:'left',
     },
@@ -214,7 +218,6 @@ const styles = StyleSheet.create({
       fontWeight:'800',
     },
     icon:{
-
       paddingLeft:10,
       paddingTop:4,
 
