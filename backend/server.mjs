@@ -136,26 +136,28 @@ app.post('/saveUserSelections', async (req, res) => {
   const { userId, selectedTypeOfFood, selectedData } = req.body;
 
   try {
-      const conn = await pool.getConnection();
-      await conn.query('DELETE FROM UserSelections WHERE userid = ?', [userId]);
+    const conn = await pool.getConnection();
 
-      for (const typeId of selectedTypeOfFood) {
-          await conn.query('INSERT INTO UserSelections (userid, typeId, isSelected) VALUES (?, ?, true)', [userId, typeId]);
-      }
+    // Clear previous selections for the user
+    await conn.query('DELETE FROM UserSelections WHERE userid = ?', [userId]);
 
-      for (const dataId of selectedData) {
-          await conn.query('INSERT INTO UserSelections (userid, dataId, isSelected) VALUES (?, ?, true)', [userId, dataId]);
-      }
+    // Insert new selections
+    for (const typeId of selectedTypeOfFood) {
+      await conn.query('INSERT INTO UserSelections (userid, foodType, isSelected) VALUES (?, ?, true)', [userId, typeOfFood.find(item => item.id === typeId).txt]);
+    }
 
-      conn.release();
+    for (const dataId of selectedData) {
+      await conn.query('INSERT INTO UserSelections (userid, ingredient, isSelected) VALUES (?, ?, true)', [userId, data.find(item => item.id === dataId).txt]);
+    }
 
-      res.status(200).json({ success: true, message: 'User selections saved successfully' });
+    conn.release();
+
+    res.status(200).json({ success: true, message: 'User selections saved successfully' });
   } catch (error) {
-      console.error('Error saving user selections:', error);
-      res.status(500).json({ success: false, message: 'Internal server error' });
+    console.error('Error saving user selections:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
-
 
 
 

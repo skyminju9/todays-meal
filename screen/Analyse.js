@@ -54,9 +54,9 @@ function Analyse({ route }) {
       const response = await axios.post(
         'http://ceprj.gachon.ac.kr:60022/saveUserSelections',
         {
-          userid: userId,
-          selectedTypeOfFood: selectedItems.filter((id) => id <= 5),
-          selectedData: selectedItems.filter((id) => id > 5),
+          userId: userId, // Updated key to match the server-side parameter name
+          selectedTypeOfFood: selectedItems.filter((id) => id <= 5).map(id => typeOfFood.find(item => item.id === id).txt),
+          selectedData: selectedItems.filter((id) => id > 5).map(id => data.find(item => item.id === id).txt),
         }
       );
 
@@ -128,8 +128,6 @@ function Analyse({ route }) {
     </View>
   );
 }
-
-
 
 const styles = StyleSheet.create({
     container: {
