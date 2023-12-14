@@ -4,13 +4,9 @@ import { createPool } from 'mariadb';
 import { hash, compare } from 'bcrypt';
 import session from 'express-session';
 import path from 'path';
-import favicon from 'serve-favicon';
-
 
 const app = express();
 const PORT = process.env.PORT || 60022;
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
-
 
 app.use(json());
 app.use(session({
@@ -19,10 +15,6 @@ app.use(session({
   saveUninitialized: false,
   cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 },
 }));
-
-app.use(express.static(path.join(__dirname, '../adminscreen/public')));
-
-app.use(favicon(path.join(__dirname, '../adminscreen/public', 'favicon.ico')));
 
 // Database connection pool setup
 const pool = createPool({
@@ -33,20 +25,8 @@ const pool = createPool({
   connectionLimit: 5,
 });
 
-/*
 app.get('/', (req, res) => {
     res.send('Hello from the backend!'); // 루트 경로로 요청이 왔을 때 "Hello from the backend!"를 응답으로 보냅니다.
-});
-*/
-
-app.get('/admin', (req, res) => {
-  const filePath = path.resolve(__dirname, '../adminscreen/public', 'index.html');
-  res.sendFile(filePath);
-});
-
-app.get('*', (req, res) => {
-  const filePath = path.resolve(__dirname, '../adminscreen/public', 'index.html');
-  res.sendFile(filePath);
 });
 
 // Login endpoint
@@ -174,7 +154,17 @@ app.post('/saveUserSelections', async (req, res) => {
   }
 });
 
+const isAdmin = (req, res, next) => {
+  if (req.session.user && req.session.user.isAdmin) {
+    next();
+  } else {
+    res.status(403).json({ success: false, message: 'Unauthorized access' });
+  }
+};
 
+app.get('/admin', isAdmin, (req, res) => {
+  res.send('Welcome to the admin dashboard!');
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
