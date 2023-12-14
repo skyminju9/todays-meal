@@ -11,7 +11,7 @@ import axios from "axios";
 const getSessionUserName = async () => {
 
     try{
-        const response = await axios.get('http://ceprj.gachon.ac.kr:80/getUserName');
+        const response = await axios.get('http://ceprj.gachon.ac.kr:60022/getUserName');
         //console.log('Server response:', response.data);
         return response.data.userName;
     }catch(error){

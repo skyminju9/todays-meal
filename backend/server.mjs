@@ -6,7 +6,7 @@ import session from 'express-session';
 import path from 'path';
 
 const app = express();
-const PORT = process.env.PORT || 80;
+const PORT = process.env.PORT || 60022;
 
 app.use(json());
 app.use(session({
@@ -154,6 +154,7 @@ app.post('/saveUserSelections', async (req, res) => {
   }
 });
 
+/*
 const isAdmin = (req, res, next) => {
   if (req.session.user && req.session.user.isAdmin) {
     next();
@@ -165,6 +166,8 @@ const isAdmin = (req, res, next) => {
 app.get('/admin', isAdmin, (req, res) => {
   res.send('Welcome to the admin dashboard!');
 });
+*/
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

@@ -20,7 +20,7 @@ function LoginPage(){
         }
     
         try {
-            const response = await fetch('http://ceprj.gachon.ac.kr:80/login', {
+            const response = await fetch('http://ceprj.gachon.ac.kr:60022/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
