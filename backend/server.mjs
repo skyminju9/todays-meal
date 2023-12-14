@@ -5,12 +5,8 @@ import { hash, compare } from 'bcrypt';
 import session from 'express-session';
 import path from 'path';
 
-
-
 const app = express();
 const PORT = process.env.PORT || 60022;
-
-
 
 app.use(json());
 app.use(session({
@@ -29,12 +25,9 @@ const pool = createPool({
   connectionLimit: 5,
 });
 
-
 app.get('/', (req, res) => {
     res.send('Hello from the backend!'); // 루트 경로로 요청이 왔을 때 "Hello from the backend!"를 응답으로 보냅니다.
 });
-
-
 
 // Login endpoint
 app.post('/login', async (req, res) => {
@@ -161,7 +154,17 @@ app.post('/saveUserSelections', async (req, res) => {
   }
 });
 
+const isAdmin = (req, res, next) => {
+  if (req.session.user && req.session.user.isAdmin) {
+    next();
+  } else {
+    res.status(403).json({ success: false, message: 'Unauthorized access' });
+  }
+};
 
+app.get('/admin', isAdmin, (req, res) => {
+  res.send('Welcome to the admin dashboard!');
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
