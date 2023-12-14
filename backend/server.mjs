@@ -19,7 +19,7 @@ app.use(session({
   cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 },
 }));
 
-app.use(express.static('adminPage/build'));
+app.use(express.static(path.join(__dirname, 'adminPanel', 'build')));
 
 // Database connection pool setup
 const pool = createPool({
