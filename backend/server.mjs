@@ -37,12 +37,12 @@ app.get('/', (req, res) => {
 */
 
 app.get('/admin', (req, res) => {
-  const filePath = path.resolve(__dirname, 'adminPanel', 'build', 'index.html');
+  const filePath = path.resolve(__dirname, '../adminscreen', 'public', 'index.html');
   res.sendFile(filePath);
 });
 
 app.get('*', (req, res) => {
-  const filePath = path.resolve(__dirname, 'adminPanel', 'build', 'index.html');
+  const filePath = path.resolve(__dirname, '../adminscreen', 'public', 'index.html');
   res.sendFile(filePath);
 });
 
