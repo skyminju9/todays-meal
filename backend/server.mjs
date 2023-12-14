@@ -4,6 +4,7 @@ import { createPool } from 'mariadb';
 import { hash, compare } from 'bcrypt';
 import session from 'express-session';
 import path from 'path';
+import favicon from 'serve-favicon';
 
 
 const app = express();
@@ -21,8 +22,7 @@ app.use(session({
 
 app.use(express.static(path.join(__dirname, '../adminscreen/public')));
 
-// Ignore /favicon.ico requests
-app.get('/favicon.ico', (req, res) => res.status(204));
+app.use(favicon(path.join(__dirname, '../adminscreen/public', 'favicon.ico')));
 
 // Database connection pool setup
 const pool = createPool({
