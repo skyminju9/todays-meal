@@ -29,7 +29,7 @@ function SignUpPage(){
 
         try {
             
-            const response = await fetch('http://ceprj.gachon.ac.kr:60022/signup', {
+            const response = await fetch('http://ceprj.gachon.ac.kr:80/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

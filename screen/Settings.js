@@ -13,7 +13,7 @@ import { FadeInLeft } from "react-native-reanimated";
 const getSessionUserName = async () => {
 
   try{
-      const response = await axios.get('http://ceprj.gachon.ac.kr:60022/getUserName');
+      const response = await axios.get('http://ceprj.gachon.ac.kr:80/getUserName');
       //console.log('Server response:', response.data);
       return response.data.userName;
   }catch(error){
@@ -49,7 +49,7 @@ function Settings() {
     const handleLogout = async () => {
       try {
         // 서버에 로그아웃 요청 보내기
-        const response = await axios.post('http://ceprj.gachon.ac.kr:60022/logout');
+        const response = await axios.post('http://ceprj.gachon.ac.kr:80/logout');
         const data = response.data;
   
         if (data.success) {
