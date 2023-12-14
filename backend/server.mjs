@@ -4,6 +4,7 @@ import { createPool } from 'mariadb';
 import { hash, compare } from 'bcrypt';
 import session from 'express-session';
 
+
 const app = express();
 const PORT = process.env.PORT || 60022; 
 
@@ -16,6 +17,8 @@ app.use(session({
   cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 },
 }));
 
+app.use(express.static('adminPage/build'));
+
 // Database connection pool setup
 const pool = createPool({
   host: 'localhost',
@@ -25,8 +28,18 @@ const pool = createPool({
   connectionLimit: 5,
 });
 
+/*
 app.get('/', (req, res) => {
     res.send('Hello from the backend!'); // 루트 경로로 요청이 왔을 때 "Hello from the backend!"를 응답으로 보냅니다.
+});
+*/
+
+app.get('./admin', (req, res)=>{
+  res.sendFile(path.join(__dirname, 'adminPanel', 'build'))
+})
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'adminPanel', 'build', 'index.html'));
 });
 
 // Login endpoint
