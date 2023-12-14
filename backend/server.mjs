@@ -8,7 +8,7 @@ import path from 'path';
 
 const app = express();
 const PORT = process.env.PORT || 60022;
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __dirname = path.dirname(new URL(import.meta.url).pathname).substring(1);
 
 
 app.use(json());
