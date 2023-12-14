@@ -3,6 +3,7 @@ import express, { json } from 'express';
 import { createPool } from 'mariadb';
 import { hash, compare } from 'bcrypt';
 import session from 'express-session';
+import path from 'path';
 
 
 const app = express();
