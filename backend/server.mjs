@@ -6,7 +6,7 @@ import session from 'express-session';
 import path from 'path';
 
 const app = express();
-const PORT = process.env.PORT || 60022;
+const PORT = process.env.PORT || 80;
 
 app.use(json());
 app.use(session({

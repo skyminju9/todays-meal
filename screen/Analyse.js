@@ -35,7 +35,7 @@ const data = [
 
 const getSessionUserName = async (userid) => {
   try {
-    const response = await axios.get('http://ceprj.gachon.ac.kr:60022/getUserName');
+    const response = await axios.get('http://ceprj.gachon.ac.kr:80/getUserName');
     return response.data.userName;
   } catch (error) {
     console.error('Error fetching user name:', error.message);
@@ -52,7 +52,7 @@ function Analyse({ route }) {
   const handleSubmit = async () => {
     try {
       const response = await axios.post(
-        'http://ceprj.gachon.ac.kr:60022/saveUserSelections',
+        'http://ceprj.gachon.ac.kr:80/saveUserSelections',
         {
           userid: userid,
           selectedTypeOfFood: selectedItems.filter((id) => id <= 5).map(id => typeOfFood.find(item => item.id === id).txt),
