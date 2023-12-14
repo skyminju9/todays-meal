@@ -19,7 +19,7 @@ app.use(session({
   cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 },
 }));
 
-app.use(express.static(path.join(__dirname, 'adminPanel', 'build')));
+app.use(express.static(path.join(__dirname, '../adminscreen/public')));
 
 // Database connection pool setup
 const pool = createPool({
@@ -37,13 +37,11 @@ app.get('/', (req, res) => {
 */
 
 app.get('/admin', (req, res) => {
-  const filePath = path.resolve(__dirname, '../adminscreen', 'public', 'index.html');
-  res.sendFile(filePath);
+  res.sendFile(path.join(__dirname, '../adminscreen/public', 'index.html'));
 });
 
 app.get('*', (req, res) => {
-  const filePath = path.resolve(__dirname, '../adminscreen', 'public', 'index.html');
-  res.sendFile(filePath);
+  res.sendFile(path.join(__dirname, '../adminscreen/public', 'index.html'));
 });
 
 // Login endpoint
