@@ -8,7 +8,7 @@ import path from 'path';
 
 const app = express();
 const PORT = process.env.PORT || 60022;
-const __dirname = path.dirname(new URL(import.meta.url).pathname).substring(1);
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 
 app.use(json());
@@ -37,11 +37,13 @@ app.get('/', (req, res) => {
 */
 
 app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, '../adminscreen/public', 'index.html'));
+  const filePath = path.resolve(__dirname, '../adminscreen/public', 'index.html');
+  res.sendFile(filePath);
 });
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../adminscreen/public', 'index.html'));
+  const filePath = path.resolve(__dirname, '../adminscreen/public', 'index.html');
+  res.sendFile(filePath);
 });
 
 // Login endpoint
