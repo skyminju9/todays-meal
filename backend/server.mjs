@@ -21,6 +21,9 @@ app.use(session({
 
 app.use(express.static(path.join(__dirname, '../adminscreen/public')));
 
+// Ignore /favicon.ico requests
+app.get('/favicon.ico', (req, res) => res.status(204));
+
 // Database connection pool setup
 const pool = createPool({
   host: 'localhost',
