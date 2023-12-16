@@ -44,15 +44,18 @@ def get_recommendations():
     try:
         user_id = request.json.get('user_id') #id 받아옴
         if not user_id:
-            return jsonify({'error': 'User ID is required'}), 400
-        user_preferences = request.json.get('user_preferences') #선호도 받아옴
+            raise ValueError('User ID is required')
+
+        user_preferences = request.json.get('user_preferences')
         if not user_preferences:
-            return jsonify({'error': 'User preferences are required'}), 400
-        if not user_id or not isinstance(user_preferences, dict):
-            return jsonify({'error': 'Invalid data format'}), 400
+            raise ValueError('User preferences are required')
+
+        if not isinstance(user_preferences, dict):
+            raise TypeError('Invalid data format for user preferences')
+
         
-        print("user_preferences:",user_preferences)
-        
+        # print("user_preferences:",user_preferences)
+
         # 사용자 선호도에 대한 벡터 생성
         user_category_vector = create_preference_vector(user_preferences['typeOfFood'], category_model)
         user_ingredient_vector = create_preference_vector(user_preferences['selectedData'], ingredient_model)
