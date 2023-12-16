@@ -177,26 +177,42 @@ app.post('/deleteAccount', async (req, res) => {
   try {
     const conn = await pool.getConnection();
 
-    // Delete user data from Users and UserSelections tables
-    await conn.query('DELETE FROM Users WHERE userid = ?', [userid]);
-    await conn.query('DELETE FROM UserSelections WHERE userid = ?', [userid]);
+    // Start a transaction to ensure atomicity
+    await conn.beginTransaction();
 
-    conn.release();
+    try {
+      // Delete user data from UserSelections table
+      await conn.query('DELETE FROM UserSelections WHERE userid = ?', [userid]);
 
-    // Clear session after successful deletion
-    req.session.destroy((err) => {
-      if (err) {
-        console.error('Error clearing session:', err);
-        res.status(500).json({ success: false, message: 'Internal server error' });
-      } else {
-        res.status(200).json({ success: true, message: 'Account deletion successful' });
-      }
-    });
+      // Delete user data from Users table
+      await conn.query('DELETE FROM Users WHERE userid = ?', [userid]);
+
+      // Commit the transaction if all queries succeed
+      await conn.commit();
+
+      // Clear session after successful deletion
+      req.session.destroy((err) => {
+        if (err) {
+          console.error('Error clearing session:', err);
+          res.status(500).json({ success: false, message: 'Internal server error' });
+        } else {
+          res.status(200).json({ success: true, message: 'Account deletion successful' });
+        }
+      });
+    } catch (error) {
+      // Rollback the transaction if any query fails
+      await conn.rollback();
+      throw error;
+    } finally {
+      // Release the connection
+      conn.release();
+    }
   } catch (error) {
     console.error('Error deleting user account:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
+
 
 // Add this route after the signup endpoint
 app.post('/updatePushNotificationSetting', async (req, res) => {
