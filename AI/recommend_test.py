@@ -46,8 +46,8 @@ def create_preference_vector(items, model):
     
 # def get_recommendations():   
 data = {"user_id":"user0",
-    "user_preferences":{"typeOfFood":["한식","양식"],
-                            "selectedData":["당근","애호박","두부","닭고기"]}}
+    "user_preferences":{"typeOfFood":['중식', '채식'],
+                            "selectedData":['토마토', '딸기']}}
 user_id = data['user_id']
 user_preferences = data['user_preferences']
 

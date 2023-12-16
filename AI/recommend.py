@@ -51,6 +51,8 @@ def get_recommendations():
         if not user_id or not isinstance(user_preferences, dict):
             return jsonify({'error': 'Invalid data format'}), 400
         
+        print("user_preferences:",user_preferences)
+        
         # 사용자 선호도에 대한 벡터 생성
         user_category_vector = create_preference_vector(user_preferences['typeOfFood'], category_model)
         user_ingredient_vector = create_preference_vector(user_preferences['selectedData'], ingredient_model)
