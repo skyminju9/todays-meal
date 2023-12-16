@@ -4,10 +4,14 @@ import {createPool} from 'mariadb';
 import {hash, compare} from 'bcrypt';
 import session from 'express-session';
 import path from 'path';
+import { spawn } from 'child_process';
+import { fileURLToPath } from 'url';
 // import axios from 'axios';
 // import { exec } from 'child_process';
-const {spawn} = require('child_process');
-const path = require('path');
+// const {spawn} = require('child_process');
+// const path = require('path');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 
 const app = express();
 const PORT = process.env.PORT || 60022;
