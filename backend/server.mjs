@@ -154,6 +154,58 @@ app.post('/saveUserSelections', async (req, res) => {
   }
 });
 
+// Delete user account endpoint
+app.post('/deleteAccount', async (req, res) => {
+  const { userid } = req.session.user;
+
+  try {
+    const conn = await pool.getConnection();
+
+    // Delete user data from Users and UserSelections tables
+    await conn.query('DELETE FROM Users WHERE userid = ?', [userid]);
+    await conn.query('DELETE FROM UserSelections WHERE userid = ?', [userid]);
+
+    conn.release();
+
+    // Clear session after successful deletion
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Error clearing session:', err);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+      } else {
+        res.status(200).json({ success: true, message: 'Account deletion successful' });
+      }
+    });
+  } catch (error) {
+    console.error('Error deleting user account:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// Add this route after the signup endpoint
+app.post('/updatePushNotificationSetting', async (req, res) => {
+  const { pushNotificationSetting } = req.body;
+  const { userid } = req.session.user;
+
+  try {
+    const conn = await pool.getConnection();
+
+    // Update pushNotificationSetting in the Users table
+    await conn.query('UPDATE Users SET pushNotificationSetting = ? WHERE userid = ?', [
+      pushNotificationSetting,
+      userid,
+    ]);
+
+    conn.release();
+
+    res.status(200).json({ success: true, message: 'Push notification setting updated successfully' });
+  } catch (error) {
+    console.error('Error updating push notification setting:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+
 /*
 const isAdmin = (req, res, next) => {
   if (req.session.user && req.session.user.isAdmin) {
