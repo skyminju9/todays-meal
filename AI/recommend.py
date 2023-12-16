@@ -1,4 +1,3 @@
-# from flask import Flask, request, jsonify
 import sys
 import json
 from gensim.models import Word2Vec
@@ -6,8 +5,6 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
-
-# app = Flask(__name__)
 
 # 데이터 로드, 모델 로드 o
 seasonal_foods = pd.read_csv('../data/seasonal_vector_data_100.csv')
@@ -41,21 +38,8 @@ def create_preference_vector(items, model):
         return np.mean(vectors, axis=0)
     else:
         return np.zeros(model.vector_size)
-        
-# @app.route('/recommend', methods=['POST'])
-# def get_recommendations():
+
 def main(user_id, user_preferences):
-    # try:
-        # user_id = request.json.get('user_id') #id 받아옴
-        # if not user_id:
-        #     return jsonify({'error': 'User ID is required'}), 400
-        # user_preferences = request.json.get('user_preferences') #선호도 받아옴
-        # if not user_preferences:
-        #     return jsonify({'error': 'User preferences are required'}), 400
-        # if not user_id or not isinstance(user_preferences, dict):
-        #     return jsonify({'error': 'Invalid data format'}), 400
-        
-        # print("user_preferences:",user_preferences)
 
         # 사용자 선호도에 대한 벡터 생성
         user_category_vector = create_preference_vector(user_preferences['typeOfFood'], category_model)
@@ -80,10 +64,6 @@ def main(user_id, user_preferences):
 
         # return jsonify(recommended_recipes.name)
         print(recommended_recipes.name.to_json(orient="records", force_ascii=False))
-
-    # except Exception as e:
-    #     app.logger.error(f'Error in recommendation for user_id {user_id}: {str(e)}')
-    #     return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     # app.run(host='0.0.0.0', port=60022)
