@@ -1,4 +1,4 @@
-import React from "react";
+import {React, useState, useEffect} from "react";
 import { Text, View, StyleSheet, Pressable, ScrollView } from "react-native";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon2 from 'react-native-vector-icons/Feather';
@@ -18,77 +18,75 @@ const getSessionUserName = async () => {
   }
 };
 
+const getSessionUserId = async () => {
+  try {
+    const response = await axios.get('http://ceprj.gachon.ac.kr:60022/getUserId');
+    if (response.data.userId) {
+      console.log('Server response:', response.data.userId);
+      return response.data.userId;
+    } else {
+      console.error('User ID is null:', response.data);
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching user ID:', error);
+    return null;
+  }
+};
 function Recipe() {
   const userIcon = <Icon name="user-circle" size={40} />;
   const navigation = useNavigation();
-  // const randomRecipeId = Math.floor(Math.random() * 2324) + 1;
   const like = <Icon2 name="thumbs-up" size={40} />;
   const dislike = <Icon2 name="thumbs-down" size={40} />;
 
-  // const findRecipeNameById = (id) => {
-  //   const recipe = recipes.find(item => item.id === id);
-  //   return recipe ? recipe.name : 'Recipe not found';
-  // };
-
-  // const foundRecipeName = findRecipeNameById(randomRecipeId);
-
-  // const findRecipeById = (id) => {
-  //   const recipe = recipes.find(item => item.id === id);
-  //   return recipe ? recipe.recipe : 'Recipe not found';
-  // };
-
-  // const foundRecipe = findRecipeById(randomRecipeId);
-
-  // const findIngredientsById = (id) => {
-  //   const recipe = recipes.find(item=>item.id===id);
-  //   return recipe ? JSON.parse(recipe.ingredient.replace(/'/g, '"')) : 'Ingredients not found';
-  // }
-
-  // const foundIngredients = findIngredientsById(randomRecipeId);
-
-  const [recipeName, setRecipeName] = useState(null);
+  // const [recipeData, setRecipeData] = useState(null);
+  const [fullRecipeData, setFullRecipeData] = useState(null);
 
   useEffect(() => {
     fetchRecommendation();
   }, []);
 
-  const fetchRecommendation = async () => {
+  const fetchRecommendation = async () => { //서버에서 추천된 레시피를 가져오는 로직
     try {
-      const user = await getSessionUserName();
-      console.log('Session user:', user);
-      if (user && user.userid) {
-        const userId = user.userid; // 서버에서 반환된 사용자 ID
-
+      const userId = await getSessionUserId(); // 사용자 ID를 가져옵니다.
+      console.log("userId: ", userId);
+    if (userId) {
         const response = await axios.post('http://ceprj.gachon.ac.kr:60022/recommend', {
-        user_id: userId
-      });
-        const data = response.data;
-        console.log('Received data from server:', data); //로그 출력
-        setRecipeName(data.recipeName);
+        user_id: userId});
+        const recommendedRecipeName = response.data.recommend; // 서버로부터 받은 레시피 이름
+        // const recommendedRecipe = recipes.find(r => r.name === recipeName); // JSON 파일에서 레시피 상세정보 찾기
+        // setRecipeData(recommendedRecipe);// 서버로부터 받은 레시피 데이터를 저장
+        findFullRecipeData(recommendedRecipeName); // 레시피 이름으로 JSON에서 데이터 검색
       }
     } catch (error) {
       console.error('Error fetching recommendation:', error);
     }
   };
 
-  const foundRecipe = recipes.find(r => r.name === recipeName);
-
-  // 레시피의 이름, 재료 및 조리 방법 추출
-  const recipe_Name = foundRecipe ? foundRecipe.name : 'Recipe not found';
-  const ingredients = foundRecipe ? JSON.parse(foundRecipe.ingredient.replace(/'/g, '"')) : 'Ingredients not found';
-  // const recipeSteps = recipe ? JSON.parse(recipe.recipe.replace(/'/g, '"')) : 'Recipe not found';
-
-
-  const parseRecipe = (recipe) => {
-    try {
-      return JSON.parse(recipe.replace(/'/g, '"'));
-    } catch (error) {
-      console.error('Error parsing recipe:', error);
-      return [];
+  const findFullRecipeData = (recipeName) => { // 레시피 데이터를 찾는 로직
+    const foundRecipe = recipes.find(r => r.name === recipeName); // JSON 데이터에서 레시피 검색
+    if (foundRecipe) {
+      setFullRecipeData(foundRecipe); // 찾은 레시피 데이터를 상태에 저장
+    } else {
+      console.error('Recipe not found:', recipeName);
     }
   };
-  console.log(foundRecipe);
-  const parsedRecipe = parseRecipe(foundRecipe);
+
+  // const parseRecipe = (recipe) => {
+  //   try {
+  //     if (typeof recipe === 'undefined' || recipe === null) {
+  //       console.error('Recipe data is undefined or null');
+  //       return [];
+  //     }
+  
+  //     return JSON.parse(recipe.replace(/'/g, '"'));
+  //   } catch (error) {
+  //     console.error('Error parsing recipe:', error);
+  //     return [];
+  //   }
+  // };
+  // console.log('Found Recipe:', foundRecipe);
+  // const parsedRecipe = parseRecipe(foundRecipe);
   
 
   return (
@@ -111,31 +109,27 @@ function Recipe() {
                 Today's meal is ...
                 </Text>
                 <Text style={styles.food}>
-                {foundRecipeName}
+                {fullRecipeData.name}
                 </Text>
             </View>
             <View style={styles.recipeContainer}>
                 <Text style={styles.recipeTitle}>재료</Text>
-                {Array.isArray(foundIngredients) ? (
-                foundIngredients.map((ingredient, index) => (
+                {Array.isArray(fullRecipeData.ingredient) ? (
+                fullRecipeData.ingredient.map((ingredient, index) => (
                 <Text key={index} style={styles.recipeItem}>
                     {`${ingredient[0]} - ${ingredient[1]}`}
                 </Text>
                 ))
             ) : (
-                <Text style={styles.recipeItem}>{JSON.stringify(foundIngredients)}</Text>
+                <Text style={styles.recipeItem}>{JSON.stringify(ingredients)}</Text>
             )}
             <Text style={styles.recipeTitle}>조리 순서</Text>
-            {Array.isArray(parsedRecipe) ? (
-                parsedRecipe.map((sentence, index) => (
+            {fullRecipeData.recipe.map((step, index) => (
                 <Text key={index} style={styles.recipeItem}>
-                    {index + 1}. {sentence}
+                {index + 1}. {step}
                     {'\n'}
                 </Text>
-                ))
-            ) : (
-                <Text style={styles.recipeItem}>{parsedRecipe}</Text>
-            )}
+                ))}
             </View>
             <View style={styles.undertitleContainer}>
                 <Text style={styles.undertitle}>오늘의 레시피 추천을 평가해주세요!</Text>
