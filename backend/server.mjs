@@ -25,6 +25,30 @@ const pool = createPool({
   connectionLimit: 5,
 });
 
+async function getUserPreferences(userId) {
+  try {
+    const conn = await pool.getConnection();
+    const results = await conn.query('SELECT * FROM UserSelections WHERE userid = ?', [userId]);
+    conn.release();
+
+    
+    if (results.length > 0) {
+      const userPref = results[0];
+      console.log("typeOfFood:", userPref.typeOfFood.split(', '));
+      console.log("selectedData:", userPref.selectedData.split(', '));
+      return {
+        typeOfFood: userPref.typeOfFood.split(', '),
+        selectedData: userPref.selectedData.split(', ')
+      };
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching user preferences:', error);
+    throw error;
+  }
+}
+
 app.get('/', (req, res) => {
     res.send('Hello from the backend!'); // 루트 경로로 요청이 왔을 때 "Hello from the backend!"를 응답으로 보냅니다.
 });
@@ -237,6 +261,37 @@ app.post('/updatePushNotificationSetting', async (req, res) => {
   }
 });
 
+// recommend
+app.post('/recommend', async (req, res) => {
+  console.log("recommend");
+  console.log('Recommendation request received:', req.body);
+  try {
+    const userid = req.session.user && req.session.user.userid;
+    if (!userid) {
+      return res.status(401).json({ success: false, message: '로그인이 필요합니다' });
+    }
+
+    const userPreferences = await getUserPreferences(userid);
+    console.log("userPreferences:", userPreferences);
+    if (!userPreferences) {
+      return res.status(404).json({ success: false, message: 'User preferences not found' });
+    }
+
+  // Python 서버에 요청
+    const recommendResponse = await axios.post('http://ceprj.gachon.ac.kr:60022/recommend', 
+    { 
+      user_id: userid,
+      user_preferences: userPreferences
+    },
+    { timeout: 30000 }
+  );
+    console.log("recommendResponse:",recommendResponse);
+    res.status(200).json({ success: true, recommend: recommendResponse.data });
+  } catch (error) {
+    console.error('추천 요청 처리 중 오류 발생:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
 
 /*
 const isAdmin = (req, res, next) => {

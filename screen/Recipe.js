@@ -21,30 +21,63 @@ const getSessionUserName = async () => {
 function Recipe() {
   const userIcon = <Icon name="user-circle" size={40} />;
   const navigation = useNavigation();
-  const randomRecipeId = Math.floor(Math.random() * 2324) + 1;
+  // const randomRecipeId = Math.floor(Math.random() * 2324) + 1;
   const like = <Icon2 name="thumbs-up" size={40} />;
   const dislike = <Icon2 name="thumbs-down" size={40} />;
 
-  const findRecipeNameById = (id) => {
-    const recipe = recipes.find(item => item.id === id);
-    return recipe ? recipe.name : 'Recipe not found';
+  // const findRecipeNameById = (id) => {
+  //   const recipe = recipes.find(item => item.id === id);
+  //   return recipe ? recipe.name : 'Recipe not found';
+  // };
+
+  // const foundRecipeName = findRecipeNameById(randomRecipeId);
+
+  // const findRecipeById = (id) => {
+  //   const recipe = recipes.find(item => item.id === id);
+  //   return recipe ? recipe.recipe : 'Recipe not found';
+  // };
+
+  // const foundRecipe = findRecipeById(randomRecipeId);
+
+  // const findIngredientsById = (id) => {
+  //   const recipe = recipes.find(item=>item.id===id);
+  //   return recipe ? JSON.parse(recipe.ingredient.replace(/'/g, '"')) : 'Ingredients not found';
+  // }
+
+  // const foundIngredients = findIngredientsById(randomRecipeId);
+
+  const [recipeName, setRecipeName] = useState(null);
+
+  useEffect(() => {
+    fetchRecommendation();
+  }, []);
+
+  const fetchRecommendation = async () => {
+    try {
+      const user = await getSessionUserName();
+      console.log('Session user:', user);
+      if (user && user.userid) {
+        const userId = user.userid; // 서버에서 반환된 사용자 ID
+
+        const response = await axios.post('http://ceprj.gachon.ac.kr:60022/recommend', {
+        user_id: userId
+      });
+        const data = response.data;
+        console.log('Received data from server:', data); //로그 출력
+        setRecipeName(data.recipeName);
+      }
+    } catch (error) {
+      console.error('Error fetching recommendation:', error);
+    }
   };
 
-  const foundRecipeName = findRecipeNameById(randomRecipeId);
+  const foundRecipe = recipes.find(r => r.name === recipeName);
 
-  const findRecipeById = (id) => {
-    const recipe = recipes.find(item => item.id === id);
-    return recipe ? recipe.recipe : 'Recipe not found';
-  };
+  // 레시피의 이름, 재료 및 조리 방법 추출
+  const recipe_Name = foundRecipe ? foundRecipe.name : 'Recipe not found';
+  const ingredients = foundRecipe ? JSON.parse(foundRecipe.ingredient.replace(/'/g, '"')) : 'Ingredients not found';
+  // const recipeSteps = recipe ? JSON.parse(recipe.recipe.replace(/'/g, '"')) : 'Recipe not found';
 
-  const foundRecipe = findRecipeById(randomRecipeId);
-
-  const findIngredientsById = (id) => {
-    const recipe = recipes.find(item=>item.id===id);
-    return recipe ? JSON.parse(recipe.ingredient.replace(/'/g, '"')) : 'Ingredients not found';
-  }
-
-  const foundIngredients = findIngredientsById(randomRecipeId);
 
   const parseRecipe = (recipe) => {
     try {
@@ -54,7 +87,7 @@ function Recipe() {
       return [];
     }
   };
-
+  console.log(foundRecipe);
   const parsedRecipe = parseRecipe(foundRecipe);
   
 
