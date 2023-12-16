@@ -10,11 +10,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 # app = Flask(__name__)
 
 # 데이터 로드, 모델 로드 o
-seasonal_foods = pd.read_csv('./data/seasonal_vector_data_100.csv')
-recipes = pd.read_csv('./data/recipes_vector_data_100.csv')
+seasonal_foods = pd.read_csv('../data/seasonal_vector_data_100.csv')
+recipes = pd.read_csv('../data/recipes_vector_data_100.csv')
 
-category_model = Word2Vec.load("category_model.model")
-ingredient_model = Word2Vec.load("ingredient_model.model")
+category_model = Word2Vec.load("../category_model.model")
+ingredient_model = Word2Vec.load("../ingredient_model.model")
 
 # 벡터 열 추출 및 NaN 값 처리
 # user_vector = user_preferences[['category_vector', 'ingredient_vector']].fillna(0).iloc[0]

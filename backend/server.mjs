@@ -320,7 +320,7 @@ app.post('/recommend', async (req, res) => {
       .status(404)
       .json({success: false, message: 'User preferences not found'});
   }
-
+  console.log("JSON.stringify(userPreferences):",JSON.stringify(userPreferences));
   const scriptPath = path.join(__dirname, '../AI/recommend.py');
   const scriptArgs = [ scriptPath, userid, JSON.stringify(userPreferences)];
 
