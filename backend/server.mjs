@@ -4,8 +4,8 @@ import {createPool} from 'mariadb';
 import {hash, compare} from 'bcrypt';
 import session from 'express-session';
 import path from 'path';
-import { spawn } from 'child_process';
-import { fileURLToPath } from 'url';
+import {spawn} from 'child_process';
+import {fileURLToPath} from 'url';
 // import axios from 'axios';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -98,12 +98,10 @@ app.post('/signup', async (req, res) => {
   const {name, userid, password, pushNotificationSetting} = req.body;
 
   if (!name || !userid || !password) {
-    res
-      .status(400)
-      .json({
-        success: false,
-        message: 'Name, userid, and password are required fields',
-      });
+    res.status(400).json({
+      success: false,
+      message: 'Name, userid, and password are required fields',
+    });
     return;
   }
 
@@ -286,12 +284,10 @@ app.post('/updatePushNotificationSetting', async (req, res) => {
 
     conn.release();
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: 'Push notification setting updated successfully',
-      });
+    res.status(200).json({
+      success: true,
+      message: 'Push notification setting updated successfully',
+    });
   } catch (error) {
     console.error('Error updating push notification setting:', error);
     res.status(500).json({success: false, message: 'Internal server error'});
@@ -300,7 +296,6 @@ app.post('/updatePushNotificationSetting', async (req, res) => {
 
 // recommend
 app.post('/recommend', async (req, res) => {
-  console.log('recommend');
   console.log('Recommendation request received:', req.body);
   // try {
   const userid = req.session.user && req.session.user.userid;
@@ -317,9 +312,9 @@ app.post('/recommend', async (req, res) => {
       .status(404)
       .json({success: false, message: 'User preferences not found'});
   }
-  console.log("JSON.stringify(userPreferences):",JSON.stringify(userPreferences));
+
   const scriptPath = path.join(__dirname, '../AI/recommend.py');
-  const scriptArgs = [ scriptPath, userid, JSON.stringify(userPreferences)];
+  const scriptArgs = [scriptPath, userid, JSON.stringify(userPreferences)];
 
   const pythonProcess = spawn('python', scriptArgs);
 
