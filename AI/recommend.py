@@ -79,7 +79,7 @@ def main(user_id, user_preferences):
         recommended_recipes = recipes.iloc[top_recipe_idx]
 
         # return jsonify(recommended_recipes.name)
-        print(json.dumps(recommended_recipes.name))
+        print(recommended_recipes.name.to_json(orient="records", force_ascii=False))
 
     # except Exception as e:
     #     app.logger.error(f'Error in recommendation for user_id {user_id}: {str(e)}')
