@@ -31,8 +31,30 @@ function Settings() {
     const bellOff = <Icon3 name="bell-off" size={20} />;
     const [isOn, setIsOn] = useState(true);
     
-    const handlePress = () => {
-      setIsOn(!isOn);
+    const handlePress = async () => {
+      try {
+        // Send a request to update pushNotificationSetting on the server
+        const response = await axios.post('http://ceprj.gachon.ac.kr:60022/updatePushNotificationSetting', {
+          pushNotificationSetting: !isOn,
+        });
+    
+        const data = response.data;
+    
+        if (data.success) {
+          // Update the state locally
+          setIsOn(!isOn);
+        } else {
+          console.error('Failed to update push notification setting:', data.message);
+          // Handle failure if needed
+        }
+      } catch (error) {
+        console.error('Error updating push notification setting:', error);
+        // Handle error if needed
+      }
+    };
+
+    const handlePressAnalyse = () => {
+      navigation.navigate('Analyse', {userName, userid});
     };
     
     const fetchUserName = async () => {
@@ -65,6 +87,25 @@ function Settings() {
       } catch (error) {
         console.error('로그아웃 요청 중 오류 발생', error);
         // 오류 발생 시에 대한 처리
+      }
+    };
+
+    const handleDeleteAccount = async () => {
+      try {
+        // Send a request to the server to delete the account
+        const response = await axios.post('http://ceprj.gachon.ac.kr:60022/deleteAccount');
+        const data = response.data;
+  
+        if (data.success) {
+          // After successful deletion, navigate to the Home screen
+          navigation.navigate('Home');
+        } else {
+          console.error('Account deletion failed', data.message);
+          // Handle deletion failure
+        }
+      } catch (error) {
+        console.error('Account deletion request error', error);
+        // Handle request error
       }
     };
   
@@ -112,10 +153,10 @@ function Settings() {
             </Pressable>
           </View>
           <View style={styles.elementContainer}>
-            <Text style={styles.text} onPress={()=>navigation.navigate('Analyse')}>
+            <Text style={styles.text}>
               사용자 지정 설정 수정
             </Text>
-            <Pressable style={styles.icon}>
+            <Pressable style={styles.icon} onPress={handlePressAnalyse}>
               {rightIcon}
             </Pressable>
           </View>
@@ -131,7 +172,7 @@ function Settings() {
             <Text style={styles.text}>
               회원탈퇴
             </Text>
-            <Pressable style={styles.icon}>
+            <Pressable style={styles.icon} onPress={handleDeleteAccount}>
               {rightIcon}
             </Pressable>
           </View>
