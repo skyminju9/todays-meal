@@ -4,6 +4,7 @@ import { createPool } from 'mariadb';
 import { hash, compare } from 'bcrypt';
 import session from 'express-session';
 import path from 'path';
+import axios from 'axios';
 
 const app = express();
 const PORT = process.env.PORT || 60022;

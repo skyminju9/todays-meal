@@ -88,6 +88,16 @@ function Recipe() {
   // console.log('Found Recipe:', foundRecipe);
   // const parsedRecipe = parseRecipe(foundRecipe);
   
+  if (!fullRecipeData) {
+    return (
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.container}>
+          {/* 사용자 아이콘 및 타이틀 컨테이너 */}
+          <Text style={styles.title}>Loading recipe...</Text>
+        </View>
+      </ScrollView>
+    );
+  }
 
   return (
     <ScrollView style={styles.scrollView}>
