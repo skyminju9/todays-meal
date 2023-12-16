@@ -321,15 +321,10 @@ app.post('/recommend', async (req, res) => {
       .json({success: false, message: 'User preferences not found'});
   }
 
-  const scriptPath = path.join(__dirname, 'recommend.py');
-  const scriptCommand = [
-    'python',
-    scriptPath,
-    userid,
-    JSON.stringify(userPreferences),
-  ];
+  const scriptPath = path.join(__dirname, '../AI/recommend.py');
+  const scriptArgs = [ scriptPath, userid, JSON.stringify(userPreferences)];
 
-  const pythonProcess = spawn(...scriptCommand);
+  const pythonProcess = spawn('python', scriptArgs);
 
   let scriptOutput = '';
   pythonProcess.stdout.on('data', data => {
