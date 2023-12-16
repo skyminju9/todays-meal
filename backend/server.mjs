@@ -112,6 +112,22 @@ app.get('/getUserName', (req, res) => {
   }
 });
 
+// Get user Id
+app.get('/getUserId', (req, res) => {
+  try {
+    const userId = req.session.user && req.session.user.userid;
+    if (userId) {
+      res.status(200).json({ userId });
+    } else {
+      res.status(200).json({ userId: null });
+    }
+  } catch (error) {
+    console.error('Error getting user ID:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 // Logout endpoint
 app.post('/logout', (req, res) => {
     try {
