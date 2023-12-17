@@ -5,11 +5,20 @@ const UserManagement = () => {
 
   useEffect(() => {
     // Fetch the user list from the server
-    fetch('http://ceprj.gachon.ac.kr:60022/users') // Replace with your actual server endpoint
-      .then(response => response.json())
-      .then(data => setUsers(data))
+    fetch('http://ceprj.gachon.ac.kr:60022/users')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Fetched user data:', data);
+        setUsers(data);
+      })
       .catch(error => console.error('Error fetching user data:', error));
   }, []);
+  
 
   const handleDeleteUser = (userId) => {
     // Implement the logic to delete the user on the server
