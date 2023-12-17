@@ -61,7 +61,7 @@ def main(user_id, user_preferences):
 
         # 가장 유사한 레시피 추천
         top_recipe_idx = np.argsort(combined_similarities[0])[::-1][:90]
-        recommended_index = recipes.iloc[top_recipe_idx]
+        recommended_index = random.choice(top_recipe_idx)
         recommended_recipe = recipes.iloc[recommended_index]
         # return jsonify(recommended_recipes.name)
         print(recommended_recipe['name'].to_json(orient="records", force_ascii=False))
