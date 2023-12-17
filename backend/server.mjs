@@ -59,6 +59,38 @@ async function getUserPreferences(userId) {
   }
 }
 
+// 마지막 추천 시각을 업데이트
+async function updateLastRecommendationTime(userId) {
+  try {
+    const conn = await pool.getConnection();
+    const now = new Date();
+    await conn.query('UPDATE Users SET updateTime = ? WHERE userid = ?', [now, userId]);
+    conn.release();
+  } catch (error) {
+    console.error('Error updating last recommendation time:', error);
+    throw error;
+  }
+}
+//마지막 추천 시간 조회
+async function getLastRecommendationTime(userId) {
+  try {
+    const conn = await pool.getConnection();
+    const query = 'SELECT updateTime FROM Users WHERE userid = ?';
+    const result = await conn.query(query, [userId]);
+    conn.release();
+
+    if (result.length > 0 && result[0].lastRecommendationTime) {
+      // 데이터베이스에서 조회한 시간을 JavaScript Date 객체로 변환
+      return new Date(result[0].lastRecommendationTime);
+    } else {
+      // 추천 받은 기록이 없는 경우 null 반환
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching last recommendation time:', error);
+    throw error;
+  }
+}
 app.get('/', (req, res) => {
   res.send('Hello from the backend!'); // 루트 경로로 요청이 왔을 때 "Hello from the backend!"를 응답으로 보냅니다.
 });
@@ -371,12 +403,23 @@ app.get('/getBookmarks', async (req, res) => {
 // recommend
 app.post('/recommend', async (req, res) => {
   console.log('Recommendation request received:', req.body);
-  // try {
+  
   const userid = req.session.user && req.session.user.userid;
   if (!userid) {
     return res
       .status(401)
       .json({success: false, message: '로그인이 필요합니다'});
+  }
+
+  // 사용자의 마지막 추천 시간을 확인
+  const lastRecommendationTime = await getLastRecommendationTime(userid);
+  const currentTime = new Date();
+
+  // 마지막 추천 시간과 현재 시간을 비교(24시간 이내인지 확인)
+  if (lastRecommendationTime && currentTime - lastRecommendationTime < 86400000) {
+    return res
+      .status(200)
+      .json({success: true, message: '이미 오늘의 추천을 받았습니다'});
   }
 
   const userPreferences = await getUserPreferences(userid);
@@ -387,6 +430,7 @@ app.post('/recommend', async (req, res) => {
       .json({success: false, message: 'User preferences not found'});
   }
 
+  // 추천 알고리즘을 실행
   const scriptPath = path.join(__dirname, '../AI/recommend.py');
   const scriptArgs = [scriptPath, userid, JSON.stringify(userPreferences)];
 
@@ -397,15 +441,17 @@ app.post('/recommend', async (req, res) => {
     scriptOutput += data.toString();
   });
 
-  pythonProcess.on('close', code => {
+  pythonProcess.on('close', async (code) => {
     if (code !== 0) {
       return res
         .status(500)
         .json({success: false, message: 'Internal server error'});
     }
     try {
-      // JSON 파싱을 시도합니다.
+      // JSON 파싱 시도
       const parsedOutput = JSON.parse(scriptOutput);
+      // 마지막 추천 시간을 업데이트
+      await updateLastRecommendationTime(userid);
       res.status(200).json({success: true, recommend: parsedOutput.name});
     } catch (error) {
       // JSON 파싱 중 오류가 발생했을 때 처리

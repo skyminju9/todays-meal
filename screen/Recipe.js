@@ -73,24 +73,26 @@ function Recipe() {
     }
   };
 
-  const handleDislike = () => {
-    fetchRecommendation();
-  };
-
-  const fetchRecommendation = async () => {
-    //서버에서 추천된 레시피를 가져오는 로직
+  const handleDislike = async () => {
+    const userId = await getSessionUserId();
+    if (!userId) {
+      console.error('User ID not found.');
+      return;
+    }
+  
     try {
-      const userId = await getSessionUserId(); // 사용자 ID 가져옴
-      console.log('userId: ', userId);
-      if (userId) {
-        const response = await axios.post(
-          'http://ceprj.gachon.ac.kr:60022/recommend',
-          {
-            user_id: userId,
-          },
-        );
-        const recommendedRecipeName = response.data.recommend; // 서버로부터 받은 레시피 이름
+      const response = await axios.post(
+        'http://ceprj.gachon.ac.kr:60022/recommend',
+        { user_id: userId }
+      );
+  
+      if (response.data.success) {
+        // 새로운 추천 레시피가 있을 경우
+        const recommendedRecipeName = response.data.recommend;
         findFullRecipeData(recommendedRecipeName);
+      } else {
+        // 이미 추천을 받았거나 다른 오류가 발생한 경우
+        alert(response.data.message);
       }
     } catch (error) {
       console.error('Error fetching recommendation:', error);
