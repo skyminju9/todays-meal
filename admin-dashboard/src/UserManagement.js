@@ -3,6 +3,20 @@ import React, { useState, useEffect } from 'react';
 const UserManagement = () => {
   const [userList, setUserList] = useState([]);
 
+  const buttonstyle = {
+
+    margin: '3px 10px',
+    color: 'black',
+    fontWeight: 'normal',
+    fontSize: '15px',
+    backgroundColor: 'transparent',
+    border: '1px solid #e8e8e8',
+    width: 40,
+    height: 20,
+    cursor: 'pointer',
+
+  };
+
   useEffect(() => {
     // Fetch user list from the server
     fetch('/api/users') // Use the appropriate endpoint
@@ -12,7 +26,7 @@ const UserManagement = () => {
   }, []);
 
   return (
-    <div>
+    <div style={{padding:'20px'}}>
       <h2>User Management</h2>
       <table>
         <thead>
@@ -33,9 +47,9 @@ const UserManagement = () => {
               <td>{user.pushNotificationSetting ? 'Enabled' : 'Disabled'}</td>
               <td>
                 {/* Add a button to view user details */}
-                <button>View</button>
+                <button style={buttonstyle}>View</button>
                 {/* Add a button to delete user */}
-                <button>Delete</button>
+                <button style={buttonstyle}>Delete</button>
               </td>
             </tr>
           ))}
