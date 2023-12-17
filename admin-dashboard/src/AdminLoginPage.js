@@ -1,11 +1,11 @@
 import React, {useState} from 'react';
-import {useHistory} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 
 const AdminLoginPage = () => {
     
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const mainPageStyle = {
         backgroundColor: '#EDF6FF',
@@ -69,7 +69,7 @@ const AdminLoginPage = () => {
           if (response.ok) {
             // 로그인 성공
             console.log('로그인 성공');
-            history.push('/adminpage');
+            navigate('/admin-page');
           } else {
             // 로그인 실패
             console.log('로그인 실패');
