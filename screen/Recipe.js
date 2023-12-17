@@ -37,23 +37,6 @@ const getSessionUserId = async () => {
   }
 };
 
-const handleLike = () => {
-  const recipeid = fullRecipeData.id; // 현재 레시피 ID
-  axios.post('http://ceprj.gachon.ac.kr:60022/bookmark', { recipeid })
-    .then(response => {
-      // 북마크 추가 성공 로직
-      console.log('Bookmark added:', response.data.message);
-    })
-    .catch(error => {
-      // 에러 처리 로직
-      console.error('Error adding bookmark:', error.message);
-    });
-};
-
-const handleDislike = () => {
-  fetchRecommendation();
-};
-
 function Recipe() {
   const userIcon = <Icon name="user-circle" size={40} />;
   const navigation = useNavigation();
@@ -63,9 +46,22 @@ function Recipe() {
   // const [recipeData, setRecipeData] = useState(null);
   const [fullRecipeData, setFullRecipeData] = useState(null);
 
-  useEffect(() => {
-    fetchRecommendation();
-  }, []);
+  const handleLike = () => {
+    const recipeid = fullRecipeData.id; // 현재 레시피 ID
+    axios.post('http://ceprj.gachon.ac.kr:60022/bookmark', { recipeid })
+      .then(response => {
+        // 북마크 추가 성공 로직
+        console.log('Bookmark added:', response.data.message);
+      })
+      .catch(error => {
+        // 에러 처리 로직
+        console.error('Error adding bookmark:', error.message);
+      });
+    };
+  
+    const handleDislike = () => {
+      fetchRecommendation();
+    };
 
   const fetchRecommendation = async () => {
     //서버에서 추천된 레시피를 가져오는 로직
@@ -86,6 +82,10 @@ function Recipe() {
       console.error('Error fetching recommendation:', error);
     }
   };
+
+  useEffect(() => {
+    fetchRecommendation();
+  }, []);
 
   const findFullRecipeData = recipeName => {
     // 레시피 이름이 배열인 경우, 첫 번째 요소를 사용

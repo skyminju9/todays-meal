@@ -8,6 +8,7 @@ import {spawn} from 'child_process';
 import {fileURLToPath} from 'url';
 // import axios from 'axios';
 
+const fs = require('fs');
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
@@ -325,15 +326,20 @@ app.get('/getBookmarks', async (req, res) => {
 
   try {
     const conn = await pool.getConnection();
-    const query = 'SELECT r.* FROM BookmarkedRecipes b JOIN Recipes r ON b.recipeid = r.id WHERE b.userid = ?';
-    const bookmarks = await conn.query(query, [userid]);
+    const bookmarks = await conn.query('SELECT recipeid FROM BookmarkedRecipes WHERE userid = ?', [userid]);
     conn.release();
+    // recipes.json 파일 읽기
+    const recipesFilePath = path.join(__dirname, 'path-to-your-recipes.json');
+    const recipesData = JSON.parse(fs.readFileSync(recipesFilePath, 'utf8'));
 
-    res.status(200).json({ success: true, bookmarks });
-  } catch (error) {
+    // 북마크된 레시피 정보 찾기
+    const bookmarkedRecipes = bookmarks.map(bookmark => recipesData.find(recipe => recipe.id === bookmark.recipeid));
+
+    res.status(200).json({ success: true, bookmarks: bookmarkedRecipes });
+    } catch (error) {
     console.error('Error fetching bookmarks:', error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
-  }
+    res.status(500).json({ success: false, message: 'Internal server error' }); 
+}
 });
 
 // recommend
