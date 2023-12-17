@@ -1,23 +1,20 @@
 import React from "react";
-import {Route, Switch, NavLink} from 'react-router-dom';
-import Home from './components/Home';
-import AdminLogin from './components/AdminLogin';
-import AdminDashboard from './components/AdminDashboard';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import MainPage from "./MainPage";
+import AdminLoginPage from "./AdminLoginPage";
+import AdminPage from "./AdminPage";
 
-function App() {
-  return (
-    <div>
-      <nav>
-        <NavLink to="/">Home</NavLink>
-        <NavLink to="/admin-login">Admin Login</NavLink>
-      </nav>
-      <Switch>
-        <Route path="/admin" component={AdminDashboard}/>
-        <Route path="/admin-login" component={AdminLogin}/>
-        <Route path="/" exact component={Home}/>
-      </Switch>
-    </div>
+
+function App(props){
+  return(
+    <BrowserRouter>
+      <Routes>
+        <Route path="/todaysmeal" element={<MainPage />} />
+        <Route path="/admin-login" element={<AdminLoginPage />} />
+        <Route path="/admin" element={<AdminPage />} />
+      </Routes>
+    </BrowserRouter>
   );
-}
+};
 
 export default App;
