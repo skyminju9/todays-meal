@@ -481,6 +481,10 @@ app.post('/api/admin-login', (req, res) => {
   }
 });
 
+app.get('/admin-page', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
