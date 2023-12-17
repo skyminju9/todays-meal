@@ -472,7 +472,7 @@ app.post('/recommend', async (req, res) => {
 });
 
 // New endpoint to get the list of users
-app.get('/users', (req, res) => {
+app.get('/api/users', (req, res) => {
   const query = 'SELECT id, name, userid, pushNotificationSetting FROM Users';
   pool.query(query)
     .then((results) => {
@@ -484,7 +484,7 @@ app.get('/users', (req, res) => {
     });
 });
 
-app.delete('/users/:id', (req, res) => {
+app.delete('/api/users/:id', (req, res) => {
   const userId = req.params.id;
   const query = 'DELETE FROM Users WHERE id = ?';
   pool.query(query, [userId])
