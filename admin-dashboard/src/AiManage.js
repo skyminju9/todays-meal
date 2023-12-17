@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import UserManagement from './UserManagement';
 
-const AdminPage = () => {
+const aiManage = () => {
   const layoutStyle = {
     display: 'flex',
     height: '100vh',
@@ -11,6 +10,12 @@ const AdminPage = () => {
   const navStyle = {
     backgroundColor: '#EDF6FF',
     width: '200px',
+    padding: '20px',
+    boxSizing: 'border-box',
+  };
+
+  const contentStyle = {
+    flex: 1,
     padding: '20px',
     boxSizing: 'border-box',
   };
@@ -56,12 +61,9 @@ const AdminPage = () => {
           </li>
         </ul>
       </nav>
-      <div>
-        <UserManagement/>
-      </div>
     </div>
   );
 };
 
 
-export default AdminPage;
+export default aiManage;
