@@ -63,8 +63,8 @@ def main(user_id, user_preferences):
         top_recipe_idx = np.argsort(combined_similarities[0])[::-1][:90]
         recommended_index = random.choice(top_recipe_idx)
         recommended_recipe = recipes.iloc[recommended_index]
-        # return jsonify(recommended_recipes.name)
-        print(recommended_recipe['name'].to_json(orient="records", force_ascii=False))
+        # return jsonify(recommended_recipes.name).to_json(orient="records", force_ascii=False)
+        print(json.dumps({"name": recommended_recipe['name']}))
 
 if __name__ == '__main__':
     # app.run(host='0.0.0.0', port=60022)

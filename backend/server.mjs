@@ -367,8 +367,9 @@ app.post('/recommend', async (req, res) => {
   const pythonProcess = spawn('python', scriptArgs);
 
   let scriptOutput = '';
-  pythonProcess.stdout.on('data', data => {
-    scriptOutput += data.toString();
+  pythonProcess.stdout.on('data', (data) => {
+    const output = JSON.parse(data.toString());
+    console.log("추천된 레시피:", output.name);
   });
 
   pythonProcess.on('close', code => {
