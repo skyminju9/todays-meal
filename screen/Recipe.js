@@ -1,5 +1,5 @@
 import {React, useState, useEffect} from 'react';
-import {Text, View, StyleSheet, Pressable, ScrollView} from 'react-native';
+import {Text, View, StyleSheet, Pressable, ScrollView, Modal} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon2 from 'react-native-vector-icons/Feather';
 import {useNavigation} from '@react-navigation/native';
@@ -46,17 +46,30 @@ function Recipe() {
   // const [recipeData, setRecipeData] = useState(null);
   const [fullRecipeData, setFullRecipeData] = useState(null);
 
+  const [modalVisible, setModalVisible] = useState(false); // 모달의 표시 여부 상태
+  const [bookmarkMessage, setBookmarkMessage] = useState(''); // 북마크 메시지 상태
+  const [isBookmarked, setIsBookmarked] = useState(false); // 북마크 상태
+
   const handleLike = () => {
     const recipeid = fullRecipeData.id; // 현재 레시피 ID
-    axios.post('http://ceprj.gachon.ac.kr:60022/bookmark', { recipeid })
-      .then(response => {
-        // 북마크 추가 성공 로직
-        console.log('Bookmark added:', response.data.message);
-      })
-      .catch(error => {
-        // 에러 처리 로직
-        console.error('Error adding bookmark:', error.message);
-      });
+    if (isBookmarked) {
+      // 이미 북마크된 상태
+      setBookmarkMessage('이미 북마크된 레시피입니다.');
+      setModalVisible(true);
+    } else {
+      // 북마크되지 않은 상태
+      axios.post('http://ceprj.gachon.ac.kr:60022/bookmark', { recipeid })
+        .then(response => {
+          console.log('Bookmark added:', response.data.message);
+          setIsBookmarked(true);
+          setBookmarkMessage('레시피가 북마크되었습니다.');
+          setModalVisible(true);
+        })
+        .catch(error => {
+          // 에러 처리 로직
+          console.error('Error adding bookmark:', error.message);
+        });
+    }
     };
   
     const handleDislike = () => {
@@ -189,6 +202,22 @@ function Recipe() {
             style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             {dislike}</Pressable>
         </View>
+        <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>{bookmarkMessage}</Text>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => setModalVisible(false)}>
+              <Text style={styles.textStyle}>확인</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
       </View>
     </ScrollView>
   );
@@ -257,6 +286,43 @@ const styles = StyleSheet.create({
   underText: {
     fontSize: 13,
     padding: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // 반투명 배경
+  },
+  modalView: {
+    width: '80%', // 모달의 너비를 화면의 80%로 설정
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 15,
+    textAlign: 'center'
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center'
   },
 });
 

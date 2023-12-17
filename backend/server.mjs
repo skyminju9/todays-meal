@@ -316,6 +316,32 @@ app.post('/bookmark', async (req, res) => {
   }
 });
 
+// Bookmark delete
+app.delete('/deleteBookmark/:id', async (req, res) => {
+  const bookmarkId = req.params.id;
+  const userid = req.session.user && req.session.user.userid;
+
+  if (!userid) {
+    return res.status(401).json({ success: false, message: '로그인이 필요합니다' });
+  }
+
+  try {
+    const conn = await pool.getConnection();
+    // 해당 사용자의 북마크만 삭제
+    const result = await conn.query('DELETE FROM BookmarkedRecipes WHERE recipeid = ? AND userid = ?', [bookmarkId, userid]);
+    conn.release();
+    
+    if (result.affectedRows === 0) {// 북마크가 없는 경우
+      res.status(404).json({ success: false, message: 'Bookmark not found' });
+    } else {// 삭제 성공
+      res.status(200).json({ success: true, message: 'Bookmark deleted successfully' });
+    }
+  } catch (error) {
+    console.error('Error deleting bookmark:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
 // Get bookmarks
 app.get('/getBookmarks', async (req, res) => {
   const userid = req.session.user && req.session.user.userid;
