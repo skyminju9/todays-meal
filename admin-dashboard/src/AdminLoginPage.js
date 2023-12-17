@@ -65,8 +65,10 @@ const AdminLoginPage = () => {
             },
             body: JSON.stringify({ username, password }),
           });
+
+          const data = await response.json();
     
-          if (response.ok) {
+          if (data.success) {
             // 로그인 성공
             console.log('로그인 성공');
             navigate('/admin-page');
@@ -74,6 +76,7 @@ const AdminLoginPage = () => {
             // 로그인 실패
             console.log('로그인 실패');
           }
+          console.log(data.message);
         } catch (error) {
           console.error('로그인 요청 중 오류:', error);
         }
