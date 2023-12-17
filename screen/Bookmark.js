@@ -34,12 +34,36 @@ function Bookmark() {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [selectedBookmarkId, setSelectedBookmarkId] = useState(null);
 
-
   const openModal = bookmark => {
-    // 레시피의 전체 데이터를 찾기
     const fullRecipe = recipes.find(recipe => recipe.id === bookmark.id);
-    setSelectedRecipe(fullRecipe);
-    setModalVisible(true);
+    if (fullRecipe) {
+      // ingredient가 문자열인 경우 JSON 배열로 파싱
+      if (typeof fullRecipe.ingredient === 'string') {
+        try {
+          // JSON 형식에 맞지 않는 문자열 처리
+          const fixedIngredient = fullRecipe.ingredient.replace(/'/g, '"');
+          fullRecipe.ingredient = JSON.parse(fixedIngredient);
+        } catch (error) {
+          console.error('Error parsing ingredients:', error);
+          fullRecipe.ingredient = []; // 파싱 실패 시 빈 배열로 설정
+        }
+      }
+
+      // recipe가 문자열인 경우 JSON 배열로 파싱
+      if (typeof fullRecipe.recipe === 'string') {
+        try {
+          // JSON 형식에 맞지 않는 문자열 처리
+          const fixedRecipe = fullRecipe.recipe.replace(/'/g, '"');
+          fullRecipe.recipe = JSON.parse(fixedRecipe);
+        } catch (error) {
+          console.error('Error parsing recipe:', error);
+          fullRecipe.recipe = []; // 파싱 실패 시 빈 배열로 설정
+        }
+      }
+
+      setSelectedRecipe(fullRecipe);
+      setModalVisible(true);
+    }
   };
 
   useEffect(() => {
@@ -72,15 +96,20 @@ function Bookmark() {
     fetchBookmarks();
   }, []);
 
-  const openDeleteModal = (bookmarkId) => {
+  const openDeleteModal = bookmarkId => {
     setSelectedBookmarkId(bookmarkId);
     setDeleteModalVisible(true);
   };
 
-  const deleteBookmark = async (bookmarkId) => {
+  const deleteBookmark = async () => {
     try {
-      await axios.delete(`http://ceprj.gachon.ac.kr:60022/deleteBookmark/${bookmarkId}`);
-      setBookmarks(bookmarks.filter(bookmark => bookmark.id !== bookmarkId));
+      await axios.delete(
+        `http://ceprj.gachon.ac.kr:60022/deleteBookmark/${selectedBookmarkId}`,
+      );
+      setBookmarks(
+        bookmarks.filter(bookmark => bookmark.id !== selectedBookmarkId),
+      );
+      setDeleteModalVisible(false); // 삭제 후 삭제 모달 닫기
     } catch (error) {
       console.error('Error deleting bookmark:', error);
     }
@@ -95,16 +124,24 @@ function Bookmark() {
       </Pressable>
       <Text style={styles.title}>{userName}님의 보관함</Text>
       <ScrollView style={styles.scrollView}>
-        {bookmarks.map((bookmark, index) => (
-          <View key={index} style={styles.bookmarkItem}>
-          <Pressable onPress={() => openModal(bookmark)}>
-            <Text style={styles.bookmarkText}>{bookmark.name}</Text>
-          </Pressable>
-          <Pressable onPress={() => openDeleteModal(bookmark.id)}>
-            <Text style={styles.deleteText}>삭제</Text>
-          </Pressable>
-        </View>
-        ))}
+        {bookmarks.length > 0 ? (
+          bookmarks.map((bookmark, index) => (
+            <View key={index} style={styles.bookmarkItem}>
+              <Pressable onPress={() => openModal(bookmark)}>
+                <Text style={styles.bookmarkText}>{bookmark.name}</Text>
+              </Pressable>
+              <Pressable onPress={() => openDeleteModal(bookmark.id)}>
+                <Text style={styles.deleteText}>삭제</Text>
+              </Pressable>
+            </View>
+          ))
+        ) : (
+          <View style={styles.emptyMessageContainer}>
+            <Text style={styles.emptyMessageText}>
+              북마크된 레시피가 없습니다.
+            </Text>
+          </View>
+        )}
       </ScrollView>
       <Modal
         animationType="slide"
@@ -117,17 +154,21 @@ function Bookmark() {
           <View style={styles.modalView}>
             <ScrollView style={styles.modalScrollView}>
               {selectedRecipe && (
-                <View>
-                  <Text style={styles.modalTextTitle}>{selectedRecipe.name}</Text>
+                <View style={styles.modalRecipe}>
+                  <Text style={styles.modalTextTitle}>
+                    {selectedRecipe.name}
+                  </Text>
                   <Text style={styles.modalTextMidtitle}>재료:</Text>
-                  {selectedRecipe.ingredient &&
+                  {selectedRecipe &&
+                    selectedRecipe.ingredient &&
                     selectedRecipe.ingredient.map((ingredient, index) => (
                       <Text key={index} style={styles.modalText}>
                         {`${ingredient[0]} - ${ingredient[1]}`}
                       </Text>
                     ))}
-                  <Text style={styles.modalTextMidtitle}>조리 방법:</Text>
-                  {selectedRecipe.recipe &&
+                  <Text style={styles.modalTextMidtitle}>조리방법:</Text>
+                  {selectedRecipe &&
+                    selectedRecipe.recipe &&
                     selectedRecipe.recipe.map((step, index) => (
                       <Text key={index} style={styles.modalText}>
                         {`${index + 1}. ${step}`}
@@ -148,22 +189,19 @@ function Bookmark() {
         animationType="slide"
         transparent={true}
         visible={deleteModalVisible}
-        onRequestClose={() => setDeleteModalVisible(false)}
-      >
+        onRequestClose={() => setDeleteModalVisible(false)}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Text style={styles.modalText}>삭제하시겠습니까?</Text>
             <View style={styles.modalButtonContainer}>
               <Pressable
                 style={[styles.button, styles.buttonClose]}
-                onPress={deleteBookmark}
-              >
+                onPress={deleteBookmark}>
                 <Text style={styles.textStyle}>예</Text>
               </Pressable>
               <Pressable
                 style={[styles.button, styles.buttonClose]}
-                onPress={() => setDeleteModalVisible(false)}
-              >
+                onPress={() => setDeleteModalVisible(false)}>
                 <Text style={styles.textStyle}>아니오</Text>
               </Pressable>
             </View>
@@ -178,7 +216,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    //alignItems: 'flex-start',
     margin: 0,
     backgroundColor: '#ffffff',
   },
@@ -197,13 +234,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   bookmarkItem: {
-    padding: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
   bookmarkText: {
     fontSize: 16,
     color: 'black',
+  },
+  deleteText: {
+    fontSize: 16,
+    color: 'red',
   },
   centeredView: {
     flex: 1,
@@ -212,7 +255,7 @@ const styles = StyleSheet.create({
     marginTop: 22,
   },
   modalView: {
-    width: '80%', // 모달의 너비를 화면의 80%로 설정
+    width: '80%',
     margin: 20,
     backgroundColor: 'white',
     borderRadius: 20,
@@ -226,6 +269,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  modalRecipe: {
+    alignItems: 'flex-start',
+    padding: 20,
   },
   button: {
     borderRadius: 20,
@@ -270,6 +317,18 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     width: 80,
     alignItems: 'center',
+  },
+  emptyMessageContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    margin: 20,
+  },
+  emptyMessageText: {
+    marginTop: 50,
+    // marginLeft: 20,
+    fontSize: 20,
+    color: 'grey',
   },
 });
 export default Bookmark;
