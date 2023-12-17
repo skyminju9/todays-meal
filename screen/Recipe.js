@@ -36,6 +36,24 @@ const getSessionUserId = async () => {
     return null;
   }
 };
+
+const handleLike = () => {
+  const recipeid = fullRecipeData.id; // 현재 레시피 ID
+  axios.post('http://ceprj.gachon.ac.kr:60022/bookmark', { recipeid })
+    .then(response => {
+      // 북마크 추가 성공 로직
+      console.log('Bookmark added:', response.data.message);
+    })
+    .catch(error => {
+      // 에러 처리 로직
+      console.error('Error adding bookmark:', error.message);
+    });
+};
+
+const handleDislike = () => {
+  fetchRecommendation();
+};
+
 function Recipe() {
   const userIcon = <Icon name="user-circle" size={40} />;
   const navigation = useNavigation();
@@ -87,9 +105,15 @@ function Recipe() {
       if (typeof recipe === 'string') {
         recipe = JSON.parse(recipe.replace(/'/g, '"'));
       }
+      // recipe를 JSON 파싱하여 배열로 변환
+      let recipeid = foundRecipe.id;
+      if (typeof recipe === 'string') {
+        recipeid = JSON.parse(recipe.replace(/'/g, '"'));
+      }
 
       foundRecipe.ingredient = ingredient;
       foundRecipe.recipe = recipe;
+      foundRecipe.id = recipeid;
 
       setFullRecipeData(foundRecipe);
     } else {
@@ -157,12 +181,13 @@ function Recipe() {
           <Text style={styles.underText}>
             다음 레시피 추천 시에 평가 내용을 반영해요.
           </Text>
-          <Pressable
+          <Pressable onPress={handleLike}
             style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            {like}
+            {like}</Pressable>
             <View style={{width: 30}} />
-            {dislike}
-          </Pressable>
+            <Pressable onPress={handleDislike}
+            style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            {dislike}</Pressable>
         </View>
       </View>
     </ScrollView>

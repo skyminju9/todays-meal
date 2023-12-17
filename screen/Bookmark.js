@@ -26,6 +26,10 @@ function Bookmark(){
     const navigation = useNavigation();
     const [userName, setUserName] = useState(null);
 
+    const [liked, setLiked] = useState(false);
+    const [disliked, setDisliked] = useState(false);
+    const [bookmarks, setBookmarks] = useState([]);
+
     useEffect(() => {
         const fetchUserName = async () => {
           try {
@@ -39,6 +43,21 @@ function Bookmark(){
         };
         fetchUserName();
     }, [userName]);
+
+    // 북마크 데이터를 서버로부터 가져오는 함수
+    const fetchBookmarks = async () => {
+        try {
+          const response = await axios.get('http://ceprj.gachon.ac.kr:60022/getBookmarks');
+          setBookmarks(response.data.bookmarks); // 서버로부터 받은 북마크 목록을 상태에 저장
+        } catch (error) {
+          console.error('Error fetching bookmarks:', error);
+        }
+      };
+      
+      useEffect(() => {
+        fetchBookmarks();
+      }, []);
+    
 
     return(
         <View style = {styles.container}>

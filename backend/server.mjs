@@ -294,6 +294,48 @@ app.post('/updatePushNotificationSetting', async (req, res) => {
   }
 });
 
+// Bookmark
+app.post('/bookmark', async (req, res) => {
+  const { recipeid } = req.body;
+  const userid = req.session.user && req.session.user.userid;
+
+  if (!userid) {
+    return res.status(401).json({ success: false, message: '로그인이 필요합니다' });
+  }
+
+  try {
+    const conn = await pool.getConnection();
+    await conn.query('INSERT INTO BookmarkedRecipes (userid, recipeid) VALUES (?, ?)', [userid, recipeid]);
+    conn.release();
+
+    res.status(200).json({ success: true, message: 'Bookmark added successfully' });
+  } catch (error) {
+    console.error('Error adding bookmark:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// Get bookmarks
+app.get('/getBookmarks', async (req, res) => {
+  const userid = req.session.user && req.session.user.userid;
+
+  if (!userid) {
+    return res.status(401).json({ success: false, message: '로그인이 필요합니다' });
+  }
+
+  try {
+    const conn = await pool.getConnection();
+    const query = 'SELECT r.* FROM BookmarkedRecipes b JOIN Recipes r ON b.recipeid = r.id WHERE b.userid = ?';
+    const bookmarks = await conn.query(query, [userid]);
+    conn.release();
+
+    res.status(200).json({ success: true, bookmarks });
+  } catch (error) {
+    console.error('Error fetching bookmarks:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
 // recommend
 app.post('/recommend', async (req, res) => {
   console.log('Recommendation request received:', req.body);
