@@ -58,16 +58,17 @@ const AdminLoginPage = () => {
 
     const handleLogin = async () => {
         try {
-          const response = await fetch('http://ceprj.gachon.ac.kr:60022/admin-login', {
+          const response = await fetch('http://ceprj.gachon.ac.kr:60022/api/admin-login', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({ username, password }),
+            credentials: 'include', // credentials 허용
           });
-
+      
           const data = await response.json();
-    
+      
           if (data.success) {
             // 로그인 성공
             console.log('로그인 성공');
@@ -81,6 +82,7 @@ const AdminLoginPage = () => {
           console.error('로그인 요청 중 오류:', error);
         }
     };
+      
 
     return (
         <div style={mainPageStyle}>
