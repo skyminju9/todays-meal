@@ -497,7 +497,7 @@ app.get('/admin-page', (req, res) => {
 
 // Endpoint to get the list of users
 app.get('/users', (req, res) => {
-  connection.query('SELECT * FROM Users', (err, results) => {
+  pool.query('SELECT * FROM Users', (err, results) => {
     if (err) {
       console.error('Error fetching users:', err);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -510,7 +510,7 @@ app.get('/users', (req, res) => {
 // Endpoint to delete a user
 app.delete('/users/:userId', (req, res) => {
   const userId = req.params.userId;
-  connection.query('DELETE FROM Users WHERE userid = ?', [userId], (err, results) => {
+  pool.query('DELETE FROM Users WHERE userid = ?', [userId], (err, results) => {
     if (err) {
       console.error('Error deleting user:', err);
       res.status(500).json({ error: 'Internal Server Error' });
