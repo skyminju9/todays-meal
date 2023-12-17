@@ -44,7 +44,6 @@ function Recipe() {
   const like = <Icon2 name="thumbs-up" size={40} />;
   const dislike = <Icon2 name="thumbs-down" size={40} />;
 
-  // const [recipeData, setRecipeData] = useState(null);
   const [fullRecipeData, setFullRecipeData] = useState(null);
 
   const [modalVisible, setModalVisible] = useState(false); // 모달의 표시 여부 상태
@@ -317,10 +316,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // 반투명 배경
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalView: {
-    width: '80%', // 모달의 너비를 화면의 80%로 설정
+    width: '80%',
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 20,

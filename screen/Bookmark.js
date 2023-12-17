@@ -326,7 +326,6 @@ const styles = StyleSheet.create({
   },
   emptyMessageText: {
     marginTop: 50,
-    // marginLeft: 20,
     fontSize: 20,
     color: 'grey',
   },

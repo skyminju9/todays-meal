@@ -59,7 +59,7 @@ async function getUserPreferences(userId) {
   }
 }
 
-// 마지막 추천 시각을 업데이트
+// 마지막 추천 시각 업데이트
 async function updateLastRecommendationTime(userId) {
   try {
     const conn = await pool.getConnection();
