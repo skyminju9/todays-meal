@@ -9,17 +9,33 @@ const UserManagement = () => {
     color: 'black',
     fontWeight: 'normal',
     fontSize: '15px',
-    backgroundColor: 'transparent',
-    border: '1px solid #e8e8e8',
-    width: 40,
-    height: 20,
+    backgroundColor: '#e8e8e8',
+    border: '1px solid black',
+    width: 60,
+    height: 25,
     cursor: 'pointer',
 
   };
 
+  const handleDeleteUser = (userId) => {
+    // Send a DELETE request to the server to delete the user
+    fetch(`http://ceprj.gachon.ac.kr/users/${userId}`, {
+      method: 'DELETE',
+    })
+      .then(response => {
+        if (response.ok) {
+          // Update the user list after successful deletion
+          setUserList(prevList => prevList.filter(user => user.id !== userId));
+        } else {
+          console.error('Error deleting user:', response.statusText);
+        }
+      })
+      .catch(error => console.error('Error deleting user:', error));
+  };
+
   useEffect(() => {
     // Fetch user list from the server
-    fetch('/api/users') // Use the appropriate endpoint
+    fetch('http://ceprj.gachon.ac.kr/users') // Use the appropriate endpoint
       .then(response => response.json())
       .then(data => setUserList(data))
       .catch(error => console.error('Error fetching user list:', error));
@@ -49,7 +65,7 @@ const UserManagement = () => {
                 {/* Add a button to view user details */}
                 <button style={buttonstyle}>View</button>
                 {/* Add a button to delete user */}
-                <button style={buttonstyle}>Delete</button>
+                <button style={buttonstyle} onClick={() => handleDeleteUser(user.id)}>Delete</button>
               </td>
             </tr>
           ))}
