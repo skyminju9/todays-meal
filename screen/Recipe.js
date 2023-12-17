@@ -1,5 +1,5 @@
 import {React, useState, useEffect} from 'react';
-import {Text, View, StyleSheet, Pressable, ScrollView, Modal} from 'react-native';
+import {Image, Text, View, StyleSheet, Pressable, ScrollView, Modal} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon2 from 'react-native-vector-icons/Feather';
 import {useNavigation} from '@react-navigation/native';
@@ -58,7 +58,8 @@ function Recipe() {
       setModalVisible(true);
     } else {
       // 북마크되지 않은 상태
-      axios.post('http://ceprj.gachon.ac.kr:60022/bookmark', { recipeid })
+      axios
+        .post('http://ceprj.gachon.ac.kr:60022/bookmark', {recipeid})
         .then(response => {
           console.log('Bookmark added:', response.data.message);
           setIsBookmarked(true);
@@ -70,11 +71,11 @@ function Recipe() {
           console.error('Error adding bookmark:', error.message);
         });
     }
-    };
-  
-    const handleDislike = () => {
-      fetchRecommendation();
-    };
+  };
+
+  const handleDislike = () => {
+    fetchRecommendation();
+  };
 
   const fetchRecommendation = async () => {
     //서버에서 추천된 레시피를 가져오는 로직
@@ -136,12 +137,17 @@ function Recipe() {
 
   if (!fullRecipeData) {
     return (
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.container}>
-          {/* 사용자 아이콘 및 타이틀 컨테이너 */}
-          <Text style={styles.title}>Loading recipe...</Text>
-        </View>
-      </ScrollView>
+      <View style={styles.container}>
+      <View style={styles.imageContainer}>
+        <Image source = {require('../image/logo.png')} style={styles.image}/>
+      </View>
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>
+        Loading recipe...
+        </Text>
+      </View>
+    </View>
+      
     );
   }
 
@@ -189,35 +195,38 @@ function Recipe() {
         </View>
         <View style={styles.undertitleContainer}>
           <Text style={styles.undertitle}>
-            오늘의 레시피 추천을 평가해주세요!
+            오늘의 레시피를 북마크하거나 재추천받을 수 있어요.
           </Text>
-          <Text style={styles.underText}>
-            다음 레시피 추천 시에 평가 내용을 반영해요.
-          </Text>
-          <Pressable onPress={handleLike}
-            style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            {like}</Pressable>
-            <View style={{width: 30}} />
-            <Pressable onPress={handleDislike}
-            style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            {dislike}</Pressable>
-        </View>
-        <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>{bookmarkMessage}</Text>
+          <View style={styles.buttonContainer}>
             <Pressable
-              style={[styles.button, styles.buttonClose]}
-              onPress={() => setModalVisible(false)}>
-              <Text style={styles.textStyle}>확인</Text>
+              onPress={handleLike}
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              {like}
+            </Pressable>
+            <View style={{width: 30}} />
+            <Pressable
+              onPress={handleDislike}
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              {dislike}
             </Pressable>
           </View>
         </View>
-      </Modal>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>{bookmarkMessage}</Text>
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => setModalVisible(false)}>
+                <Text style={styles.textStyle}>확인</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
       </View>
     </ScrollView>
   );
@@ -280,12 +289,15 @@ const styles = StyleSheet.create({
   undertitle: {
     alignSelf: 'center',
     color: 'black',
-    fontSize: 20,
+    fontSize: 15,
     fontWeight: 'bold',
   },
-  underText: {
-    fontSize: 13,
-    padding: 10,
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 10,
   },
   modalContainer: {
     flex: 1,
@@ -302,27 +314,37 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2
+      height: 2,
     },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 5
+    elevation: 5,
   },
   modalText: {
     fontSize: 18,
     marginBottom: 15,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   buttonClose: {
     backgroundColor: '#2196F3',
     borderRadius: 20,
     padding: 10,
-    elevation: 2
+    elevation: 2,
   },
   textStyle: {
     color: 'white',
     fontWeight: 'bold',
-    textAlign: 'center'
+    textAlign: 'center',
+  },
+  imageContainer:{
+    flex:0.5,
+    alignItems:'center',
+    justifyContent:'center',
+  },
+  image:{
+    width:200,
+    height:200,
+    resizeMode:'cover',
   },
 });
 

@@ -31,6 +31,9 @@ function Bookmark() {
   //모달
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [selectedBookmarkId, setSelectedBookmarkId] = useState(null);
+
 
   const openModal = bookmark => {
     // 레시피의 전체 데이터를 찾기
@@ -69,6 +72,11 @@ function Bookmark() {
     fetchBookmarks();
   }, []);
 
+  const openDeleteModal = (bookmarkId) => {
+    setSelectedBookmarkId(bookmarkId);
+    setDeleteModalVisible(true);
+  };
+
   const deleteBookmark = async (bookmarkId) => {
     try {
       await axios.delete(`http://ceprj.gachon.ac.kr:60022/deleteBookmark/${bookmarkId}`);
@@ -92,7 +100,7 @@ function Bookmark() {
           <Pressable onPress={() => openModal(bookmark)}>
             <Text style={styles.bookmarkText}>{bookmark.name}</Text>
           </Pressable>
-          <Pressable onPress={() => deleteBookmark(bookmark.id)}>
+          <Pressable onPress={() => openDeleteModal(bookmark.id)}>
             <Text style={styles.deleteText}>삭제</Text>
           </Pressable>
         </View>
@@ -110,15 +118,15 @@ function Bookmark() {
             <ScrollView style={styles.modalScrollView}>
               {selectedRecipe && (
                 <View>
-                  <Text style={styles.modalText}>{selectedRecipe.name}</Text>
-                  <Text style={styles.modalText}>재료:</Text>
+                  <Text style={styles.modalTextTitle}>{selectedRecipe.name}</Text>
+                  <Text style={styles.modalTextMidtitle}>재료:</Text>
                   {selectedRecipe.ingredient &&
                     selectedRecipe.ingredient.map((ingredient, index) => (
                       <Text key={index} style={styles.modalText}>
                         {`${ingredient[0]} - ${ingredient[1]}`}
                       </Text>
                     ))}
-                  <Text style={styles.modalText}>조리 방법:</Text>
+                  <Text style={styles.modalTextMidtitle}>조리 방법:</Text>
                   {selectedRecipe.recipe &&
                     selectedRecipe.recipe.map((step, index) => (
                       <Text key={index} style={styles.modalText}>
@@ -133,6 +141,32 @@ function Bookmark() {
               onPress={() => setModalVisible(!modalVisible)}>
               <Text style={styles.textStyle}>닫기</Text>
             </Pressable>
+          </View>
+        </View>
+      </Modal>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={deleteModalVisible}
+        onRequestClose={() => setDeleteModalVisible(false)}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>삭제하시겠습니까?</Text>
+            <View style={styles.modalButtonContainer}>
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={deleteBookmark}
+              >
+                <Text style={styles.textStyle}>예</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => setDeleteModalVisible(false)}
+              >
+                <Text style={styles.textStyle}>아니오</Text>
+              </Pressable>
+            </View>
           </View>
         </View>
       </Modal>
@@ -179,7 +213,6 @@ const styles = StyleSheet.create({
   },
   modalView: {
     width: '80%', // 모달의 너비를 화면의 80%로 설정
-    height: '80%', // 모달의 높이를 화면의 80%로 설정
     margin: 20,
     backgroundColor: 'white',
     borderRadius: 20,
@@ -207,9 +240,36 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'right',
   },
-  modalText: {
+  modalTextTitle: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    color: 'black',
+    marginBottom: 30,
+    textAlign: 'center',
+  },
+  modalTextMidtitle: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: 'black',
     marginBottom: 15,
     textAlign: 'center',
+  },
+  modalText: {
+    color: 'black',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '80%',
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    marginHorizontal: 10,
+    width: 80,
+    alignItems: 'center',
   },
 });
 export default Bookmark;

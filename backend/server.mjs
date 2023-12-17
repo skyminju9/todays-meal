@@ -317,8 +317,8 @@ app.post('/bookmark', async (req, res) => {
 });
 
 // Bookmark delete
-app.delete('/deleteBookmark/:id', async (req, res) => {
-  const bookmarkId = req.params.id;
+app.delete('/deleteBookmark/:recipeid', async (req, res) => {
+  const recipeid = req.params.recipeid;
   const userid = req.session.user && req.session.user.userid;
 
   if (!userid) {
@@ -328,7 +328,7 @@ app.delete('/deleteBookmark/:id', async (req, res) => {
   try {
     const conn = await pool.getConnection();
     // 해당 사용자의 북마크만 삭제
-    const result = await conn.query('DELETE FROM BookmarkedRecipes WHERE recipeid = ? AND userid = ?', [bookmarkId, userid]);
+    const result = await conn.query('DELETE FROM BookmarkedRecipes WHERE recipeid = ? AND userid = ?', [recipeid, userid]);
     conn.release();
     
     if (result.affectedRows === 0) {// 북마크가 없는 경우
