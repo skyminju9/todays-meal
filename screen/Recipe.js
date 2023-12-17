@@ -3,6 +3,7 @@ import {Image, Text, View, StyleSheet, Pressable, ScrollView, Modal} from 'react
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon2 from 'react-native-vector-icons/Feather';
 import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import recipes from '../recipes.json';
 import axios from 'axios';
 
@@ -73,7 +74,7 @@ function Recipe() {
     }
   };
 
-  const handleDislike = async () => {
+  const fetchRecommendation = async () => {
     const userId = await getSessionUserId();
     if (!userId) {
       console.error('User ID not found.');
@@ -81,56 +82,67 @@ function Recipe() {
     }
   
     try {
-      const response = await axios.post(
-        'http://ceprj.gachon.ac.kr:60022/recommend',
-        { user_id: userId }
-      );
-  
-      if (response.data.success) {
-        // 새로운 추천 레시피가 있을 경우
-        const recommendedRecipeName = response.data.recommend;
-        findFullRecipeData(recommendedRecipeName);
-      } else {
-        // 이미 추천을 받았거나 다른 오류가 발생한 경우
-        alert(response.data.message);
-      }
+      const response = await axios.post('http://ceprj.gachon.ac.kr:60022/recommend', { user_id: userId });
+      const recommendedRecipeName = response.data.recommend;
+      findFullRecipeData(recommendedRecipeName);
+      await AsyncStorage.setItem('lastRecommendedRecipe', JSON.stringify(recommendedRecipeName));
     } catch (error) {
       console.error('Error fetching recommendation:', error);
     }
   };
+  
+  const handleDislike = () => {
+    fetchRecommendation();
+  };
+  
+
 
   useEffect(() => {
-    fetchRecommendation();
+    // 로컬 스토리지에서 마지막 추천 레시피 불러옴
+    const getLastRecommendedRecipe = async () => {
+      try {
+        const lastRecommendedRecipe = await AsyncStorage.getItem('lastRecommendedRecipe');
+        if (lastRecommendedRecipe !== null) {
+          findFullRecipeData(JSON.parse(lastRecommendedRecipe));
+        } else {
+          fetchRecommendation(); // 로컬 스토리지에 없으면 새로운 추천 레시피를 가져옴
+        }
+      } catch (error) {
+        console.error('AsyncStorage 불러오기 중 오류 발생:', error);
+      }
+    };
+  
+    getLastRecommendedRecipe();
   }, []);
 
   const findFullRecipeData = recipeName => {
-    // 레시피 이름이 배열인 경우, 첫 번째 요소를 사용
-    const recipeNameStr = Array.isArray(recipeName)
-      ? recipeName[0]
-      : recipeName;
+    const recipeNameStr = Array.isArray(recipeName) ? recipeName[0] : recipeName;
     const foundRecipe = recipes.find(r => r.name === recipeNameStr);
-
+  
     if (foundRecipe) {
-      // ingredient를 JSON 파싱하여 배열로 변환
       let ingredient = foundRecipe.ingredient;
-      if (typeof ingredient === 'string') {
-        ingredient = JSON.parse(ingredient.replace(/'/g, '"'));
-      }
-      // recipe를 JSON 파싱하여 배열로 변환
       let recipe = foundRecipe.recipe;
-      if (typeof recipe === 'string') {
-        recipe = JSON.parse(recipe.replace(/'/g, '"'));
+  
+      if (typeof ingredient === 'string') {
+        try {
+          ingredient = JSON.parse(ingredient.replace(/'/g, '"'));
+        } catch (error) {
+          console.error('Error parsing ingredients:', error);
+          ingredient = [];
+        }
       }
-      // recipe를 JSON 파싱하여 배열로 변환
-      let recipeid = foundRecipe.id;
+  
       if (typeof recipe === 'string') {
-        recipeid = JSON.parse(recipe.replace(/'/g, '"'));
+        try {
+          recipe = JSON.parse(recipe.replace(/'/g, '"'));
+        } catch (error) {
+          console.error('Error parsing recipe:', error);
+          recipe = [];
+        }
       }
-
-      foundRecipe.ingredient = ingredient;
-      foundRecipe.recipe = recipe;
-      foundRecipe.id = recipeid;
-
+  
+      foundRecipe.ingredient = ingredient || [];
+      foundRecipe.recipe = recipe || [];
       setFullRecipeData(foundRecipe);
     } else {
       console.error('Recipe not found:', recipeNameStr);
