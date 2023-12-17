@@ -11,7 +11,7 @@ function App(props){
       <Routes>
         <Route path="/todaysmeal" element={<MainPage />} />
         <Route path="/admin-login" element={<AdminLoginPage />} />
-        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin-page" element={<AdminPage />} />
       </Routes>
     </BrowserRouter>
   );

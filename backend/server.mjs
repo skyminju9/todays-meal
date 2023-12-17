@@ -469,6 +469,18 @@ app.get('/todaysmeal', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
+app.post('/api/admin-login', (req, res) => {
+  const { username, password } = req.body;
+
+  // 여기에서 실제 로그인 로직을 구현합니다.
+  // 예를 들어, 하드코딩된 관리자 계정을 사용하여 간단히 확인하는 예시입니다.
+  if (username === 'admin' && password === 'admin123') {
+    res.status(200).json({ success: true, message: '로그인 성공' });
+  } else {
+    res.status(401).json({ success: false, message: '로그인 실패' });
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
