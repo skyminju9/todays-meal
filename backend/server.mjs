@@ -4,11 +4,11 @@ import {createPool} from 'mariadb';
 import {hash, compare} from 'bcrypt';
 import session from 'express-session';
 import path from 'path';
+import fs from 'fs';
 import {spawn} from 'child_process';
 import {fileURLToPath} from 'url';
 // import axios from 'axios';
 
-const fs = require('fs');
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
@@ -329,7 +329,7 @@ app.get('/getBookmarks', async (req, res) => {
     const bookmarks = await conn.query('SELECT recipeid FROM BookmarkedRecipes WHERE userid = ?', [userid]);
     conn.release();
     // recipes.json 파일 읽기
-    const recipesFilePath = path.join(__dirname, 'path-to-your-recipes.json');
+    const recipesFilePath = path.join(__dirname, '../recipes.json');
     const recipesData = JSON.parse(fs.readFileSync(recipesFilePath, 'utf8'));
 
     // 북마크된 레시피 정보 찾기
