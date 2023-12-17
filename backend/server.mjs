@@ -495,6 +495,39 @@ app.get('/admin-page', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
+connection.connect((err) => {
+  if (err) {
+    console.error('Error connecting to the database:', err);
+    return;
+  }
+  console.log('Connected to the database');
+});
+
+// Endpoint to get the list of users
+app.get('/users', (req, res) => {
+  connection.query('SELECT * FROM Users', (err, results) => {
+    if (err) {
+      console.error('Error fetching users:', err);
+      res.status(500).json({ error: 'Internal Server Error' });
+      return;
+    }
+    res.json(results);
+  });
+});
+
+// Endpoint to delete a user
+app.delete('/users/:userId', (req, res) => {
+  const userId = req.params.userId;
+  connection.query('DELETE FROM Users WHERE userid = ?', [userId], (err, results) => {
+    if (err) {
+      console.error('Error deleting user:', err);
+      res.status(500).json({ error: 'Internal Server Error' });
+      return;
+    }
+    res.json({ message: 'User deleted successfully' });
+  });
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
