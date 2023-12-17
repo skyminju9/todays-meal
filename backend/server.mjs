@@ -365,19 +365,26 @@ app.post('/recommend', async (req, res) => {
   const scriptArgs = [scriptPath, userid, JSON.stringify(userPreferences)];
 
   const pythonProcess = spawn('python', scriptArgs);
-  
-  let rawData = '';
 
-  pythonProcess.stdout.on('data', (chunk) => {
-    rawData += chunk;
+  let scriptOutput = '';
+  pythonProcess.stdout.on('data', data => {
+    scriptOutput += data.toString();
   });
 
-  pythonProcess.on('close', () => {
+  pythonProcess.on('close', code => {
+    if (code !== 0) {
+      return res
+        .status(500)
+        .json({success: false, message: 'Internal server error'});
+    }
     try {
-      const output = JSON.parse(rawData);
-      console.log("추천된 레시피:", output.name);
+      // JSON 파싱을 시도합니다.
+      const parsedOutput = JSON.parse(scriptOutput);
+      res.status(200).json({success: true, recommend: parsedOutput.name});
     } catch (error) {
+      // JSON 파싱 중 오류가 발생했을 때 처리
       console.error('JSON 파싱 오류:', error);
+      res.status(500).json({success: false, message: 'JSON parsing error'});
     }
   });
 });
