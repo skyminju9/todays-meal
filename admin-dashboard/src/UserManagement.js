@@ -19,7 +19,7 @@ const UserManagement = () => {
 
   const handleDeleteUser = (userId) => {
     // Send a DELETE request to the server to delete the user
-    fetch(`http://ceprj.gachon.ac.kr/users/${userId}`, {
+    fetch(`http://ceprj.gachon.ac.kr:60022/api/users/${userId}`, {
       method: 'DELETE',
     })
       .then(response => {
@@ -35,7 +35,7 @@ const UserManagement = () => {
 
   useEffect(() => {
     // Fetch user list from the server
-    fetch('http://ceprj.gachon.ac.kr/users') // Use the appropriate endpoint
+    fetch('http://ceprj.gachon.ac.kr:60022/api/users') // Use the appropriate endpoint
       .then(response => response.json())
       .then(data => setUserList(data))
       .catch(error => console.error('Error fetching user list:', error));
@@ -65,7 +65,7 @@ const UserManagement = () => {
                 {/* Add a button to view user details */}
                 <button style={buttonstyle}>View</button>
                 {/* Add a button to delete user */}
-                <button style={buttonstyle} onClick={() => handleDeleteUser(user.id)}>Delete</button>
+                <button style={buttonstyle}>Delete</button>
               </td>
             </tr>
           ))}
