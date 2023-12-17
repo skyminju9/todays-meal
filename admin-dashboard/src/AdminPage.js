@@ -20,18 +20,34 @@ const AdminPage = ({ children }) => {
     boxSizing: 'border-box',
   };
 
+  const buttonstyle = {
+
+  };
+
   return (
     <div style={layoutStyle}>
       <nav style={navStyle}>
         <ul style={{ listStyleType: 'none', padding: 0 }}>
           <li style={{ margin: '10px 0' }}>
-            <Link to="/admin/member">회원 관리</Link>
+            <Link to="/admin/member">
+                <button style={buttonstyle}>
+                    회원 관리
+                </button>
+            </Link>
           </li>
           <li style={{ margin: '10px 0' }}>
-            <Link to="/admin/recipe">레시피 관리</Link>
+            <Link to="/admin/recipe">
+                <button style={buttonstyle}>
+                    레시피 관리
+                </button>
+            </Link>
           </li>
           <li style={{ margin: '10px 0' }}>
-            <Link to="/admin/ai">AI 성능 지표</Link>
+            <Link to="/admin/ai">
+                <button style={buttonstyle}>
+                    AI 성능 지표
+                </button>
+            </Link>
           </li>
         </ul>
       </nav>
