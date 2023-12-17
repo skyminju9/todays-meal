@@ -471,6 +471,33 @@ app.post('/recommend', async (req, res) => {
   });
 });
 
+// New endpoint to get the list of users
+app.get('/api/users', (req, res) => {
+  const query = 'SELECT id, name, userid, pushNotificationSetting FROM Users';
+  pool.query(query)
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      console.error('Error fetching user list:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
+// New endpoint to delete a user
+app.delete('/api/users/:id', (req, res) => {
+  const userId = req.params.id;
+  const query = 'DELETE FROM Users WHERE id = ?';
+  pool.query(query, [userId])
+    .then(() => {
+      res.json({ message: 'User deleted successfully' });
+    })
+    .catch((error) => {
+      console.error('Error deleting user:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    });
+});
+
 // 정적 파일을 제공하기 위한 미들웨어 설정
 app.use(express.static(path.join(__dirname, 'build')));
 
@@ -494,32 +521,6 @@ app.post('/api/admin-login', (req, res) => {
 app.get('/admin-page', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
-
-// Endpoint to get the list of users
-app.get('/users', (req, res) => {
-  pool.query('SELECT * FROM Users', (err, results) => {
-    if (err) {
-      console.error('Error fetching users:', err);
-      res.status(500).json({ error: 'Internal Server Error' });
-      return;
-    }
-    res.json(results);
-  });
-});
-
-// Endpoint to delete a user
-app.delete('/users/:userId', (req, res) => {
-  const userId = req.params.userId;
-  pool.query('DELETE FROM Users WHERE userid = ?', [userId], (err, results) => {
-    if (err) {
-      console.error('Error deleting user:', err);
-      res.status(500).json({ error: 'Internal Server Error' });
-      return;
-    }
-    res.json({ message: 'User deleted successfully' });
-  });
-});
-
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
