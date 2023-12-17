@@ -44,7 +44,7 @@ const UserManagement = () => {
               <td>{user.name}</td>
               <td>{user.userid}</td>
               <td>{user.pushNotificationSetting}</td>
-              <td>{/* Display user selections here */}</td>
+              <td>{user.userSelections.join(', ')}</td>
               <td>
                 <button onClick={() => handleDeleteUser(user.userid)}>
                   삭제
