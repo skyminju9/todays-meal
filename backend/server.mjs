@@ -7,6 +7,7 @@ import path from 'path';
 import fs from 'fs';
 import {spawn} from 'child_process';
 import {fileURLToPath} from 'url';
+import cors from 'cors';
 // import axios from 'axios';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -24,6 +25,8 @@ app.use(
   }),
 );
 
+app.use(cors());
+
 // Database connection pool setup
 const pool = createPool({
   host: 'localhost',
@@ -32,6 +35,13 @@ const pool = createPool({
   database: 'db23307',
   connectionLimit: 5,
 });
+
+const corsOptions = {
+  origin: 'http://ceprj.gachon.ac.kr:60022', // 클라이언트의 도메인 (허용하고 싶은 도메인)
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true, // 인증 정보 (쿠키 등)를 전송하려면 true로 설정
+  optionsSuccessStatus: 204, // preflight 요청에 대한 응답 상태 코드
+};
 
 async function getUserPreferences(userId) {
   try {
