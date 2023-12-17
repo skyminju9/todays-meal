@@ -495,14 +495,6 @@ app.get('/admin-page', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-connection.connect((err) => {
-  if (err) {
-    console.error('Error connecting to the database:', err);
-    return;
-  }
-  console.log('Connected to the database');
-});
-
 // Endpoint to get the list of users
 app.get('/users', (req, res) => {
   connection.query('SELECT * FROM Users', (err, results) => {
