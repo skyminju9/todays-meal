@@ -3,6 +3,7 @@ import json
 from gensim.models import Word2Vec
 import pandas as pd
 import numpy as np
+import random
 from sklearn.metrics.pairwise import cosine_similarity
 
 
@@ -52,18 +53,18 @@ def main(user_id, user_preferences):
         # ingredient_similarities = cosine_similarity([user_ingredient_vector], recipe_ingredient_vectors)
 
         # 가중치 설정
-        category_weight = 0.1 
-        ingredient_weight = 0.9 
+        category_weight = random.uniform(0, 0.00005) 
+        ingredient_weight = random.uniform(0, 0.01)
 
         # 유사도 조합
         combined_similarities = (category_similarities * category_weight + user_seasonal_ingredient_similarities * ingredient_weight) / (category_weight + ingredient_weight)
 
         # 가장 유사한 레시피 추천
-        top_recipe_idx = np.argsort(combined_similarities[0])[::-1][:1]
-        recommended_recipes = recipes.iloc[top_recipe_idx]
-
-        # return jsonify(recommended_recipes.name)
-        print(recommended_recipes.name.to_json(orient="records", force_ascii=False))
+        top_recipe_idx = np.argsort(combined_similarities[0])[::-1][:90]
+        recommended_index = random.choice(top_recipe_idx)
+        recommended_recipe = recipes.iloc[recommended_index]
+        # return jsonify(recommended_recipes.name).to_json(orient="records", force_ascii=False)
+        print(json.dumps({"name": recommended_recipe['name']}))
 
 if __name__ == '__main__':
     # app.run(host='0.0.0.0', port=60022)

@@ -1,8 +1,9 @@
 import {React, useState, useEffect} from 'react';
-import {Text, View, StyleSheet, Pressable, ScrollView} from 'react-native';
+import {Image, Text, View, StyleSheet, Pressable, ScrollView, Modal} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon2 from 'react-native-vector-icons/Feather';
 import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import recipes from '../recipes.json';
 import axios from 'axios';
 
@@ -36,61 +37,111 @@ const getSessionUserId = async () => {
     return null;
   }
 };
+
 function Recipe() {
   const userIcon = <Icon name="user-circle" size={40} />;
   const navigation = useNavigation();
   const like = <Icon2 name="thumbs-up" size={40} />;
   const dislike = <Icon2 name="thumbs-down" size={40} />;
 
-  // const [recipeData, setRecipeData] = useState(null);
   const [fullRecipeData, setFullRecipeData] = useState(null);
 
-  useEffect(() => {
-    fetchRecommendation();
-  }, []);
+  const [modalVisible, setModalVisible] = useState(false); // 모달의 표시 여부 상태
+  const [bookmarkMessage, setBookmarkMessage] = useState(''); // 북마크 메시지 상태
+  const [isBookmarked, setIsBookmarked] = useState(false); // 북마크 상태
+
+  const handleLike = () => {
+    const recipeid = fullRecipeData.id; // 현재 레시피 ID
+    if (isBookmarked) {
+      // 이미 북마크된 상태
+      setBookmarkMessage('이미 북마크된 레시피입니다.');
+      setModalVisible(true);
+    } else {
+      // 북마크되지 않은 상태
+      axios
+        .post('http://ceprj.gachon.ac.kr:60022/bookmark', {recipeid})
+        .then(response => {
+          console.log('Bookmark added:', response.data.message);
+          setIsBookmarked(true);
+          setBookmarkMessage('레시피가 북마크되었습니다.');
+          setModalVisible(true);
+        })
+        .catch(error => {
+          // 에러 처리 로직
+          console.error('Error adding bookmark:', error.message);
+        });
+    }
+  };
 
   const fetchRecommendation = async () => {
-    //서버에서 추천된 레시피를 가져오는 로직
+    const userId = await getSessionUserId();
+    if (!userId) {
+      console.error('User ID not found.');
+      return;
+    }
+  
     try {
-      const userId = await getSessionUserId(); // 사용자 ID 가져옴
-      console.log('userId: ', userId);
-      if (userId) {
-        const response = await axios.post(
-          'http://ceprj.gachon.ac.kr:60022/recommend',
-          {
-            user_id: userId,
-          },
-        );
-        const recommendedRecipeName = response.data.recommend; // 서버로부터 받은 레시피 이름
-        findFullRecipeData(recommendedRecipeName);
-      }
+      const response = await axios.post('http://ceprj.gachon.ac.kr:60022/recommend', { user_id: userId });
+      const recommendedRecipeName = response.data.recommend;
+      findFullRecipeData(recommendedRecipeName);
+      await AsyncStorage.setItem('lastRecommendedRecipe', JSON.stringify(recommendedRecipeName));
     } catch (error) {
       console.error('Error fetching recommendation:', error);
     }
   };
+  
+  const handleDislike = () => {
+    fetchRecommendation();
+  };
+  
+
+
+  useEffect(() => {
+    // 로컬 스토리지에서 마지막 추천 레시피 불러옴
+    const getLastRecommendedRecipe = async () => {
+      try {
+        const lastRecommendedRecipe = await AsyncStorage.getItem('lastRecommendedRecipe');
+        if (lastRecommendedRecipe !== null) {
+          findFullRecipeData(JSON.parse(lastRecommendedRecipe));
+        } else {
+          fetchRecommendation(); // 로컬 스토리지에 없으면 새로운 추천 레시피를 가져옴
+        }
+      } catch (error) {
+        console.error('AsyncStorage 불러오기 중 오류 발생:', error);
+      }
+    };
+  
+    getLastRecommendedRecipe();
+  }, []);
 
   const findFullRecipeData = recipeName => {
-    // 레시피 이름이 배열인 경우, 첫 번째 요소를 사용
-    const recipeNameStr = Array.isArray(recipeName)
-      ? recipeName[0]
-      : recipeName;
+    const recipeNameStr = Array.isArray(recipeName) ? recipeName[0] : recipeName;
     const foundRecipe = recipes.find(r => r.name === recipeNameStr);
-
+  
     if (foundRecipe) {
-      // ingredient를 JSON 파싱하여 배열로 변환
       let ingredient = foundRecipe.ingredient;
-      if (typeof ingredient === 'string') {
-        ingredient = JSON.parse(ingredient.replace(/'/g, '"'));
-      }
-      // recipe를 JSON 파싱하여 배열로 변환
       let recipe = foundRecipe.recipe;
-      if (typeof recipe === 'string') {
-        recipe = JSON.parse(recipe.replace(/'/g, '"'));
+  
+      if (typeof ingredient === 'string') {
+        try {
+          ingredient = JSON.parse(ingredient.replace(/'/g, '"'));
+        } catch (error) {
+          console.error('Error parsing ingredients:', error);
+          ingredient = [];
+        }
       }
-
-      foundRecipe.ingredient = ingredient;
-      foundRecipe.recipe = recipe;
-
+  
+      if (typeof recipe === 'string') {
+        try {
+          recipe = JSON.parse(recipe.replace(/'/g, '"'));
+        } catch (error) {
+          console.error('Error parsing recipe:', error);
+          recipe = [];
+        }
+      }
+  
+      foundRecipe.ingredient = ingredient || [];
+      foundRecipe.recipe = recipe || [];
       setFullRecipeData(foundRecipe);
     } else {
       console.error('Recipe not found:', recipeNameStr);
@@ -99,12 +150,17 @@ function Recipe() {
 
   if (!fullRecipeData) {
     return (
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.container}>
-          {/* 사용자 아이콘 및 타이틀 컨테이너 */}
-          <Text style={styles.title}>Loading recipe...</Text>
-        </View>
-      </ScrollView>
+      <View style={styles.container}>
+      <View style={styles.imageContainer}>
+        <Image source = {require('../image/logo.png')} style={styles.image}/>
+      </View>
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>
+        Loading recipe...
+        </Text>
+      </View>
+    </View>
+      
     );
   }
 
@@ -152,18 +208,38 @@ function Recipe() {
         </View>
         <View style={styles.undertitleContainer}>
           <Text style={styles.undertitle}>
-            오늘의 레시피 추천을 평가해주세요!
+            오늘의 레시피를 북마크하거나 재추천받을 수 있어요.
           </Text>
-          <Text style={styles.underText}>
-            다음 레시피 추천 시에 평가 내용을 반영해요.
-          </Text>
-          <Pressable
-            style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            {like}
+          <View style={styles.buttonContainer}>
+            <Pressable
+              onPress={handleLike}
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              {like}
+            </Pressable>
             <View style={{width: 30}} />
-            {dislike}
-          </Pressable>
+            <Pressable
+              onPress={handleDislike}
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              {dislike}
+            </Pressable>
+          </View>
         </View>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>{bookmarkMessage}</Text>
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => setModalVisible(false)}>
+                <Text style={styles.textStyle}>확인</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
       </View>
     </ScrollView>
   );
@@ -226,12 +302,62 @@ const styles = StyleSheet.create({
   undertitle: {
     alignSelf: 'center',
     color: 'black',
-    fontSize: 20,
+    fontSize: 15,
     fontWeight: 'bold',
   },
-  underText: {
-    fontSize: 13,
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+    borderRadius: 20,
     padding: 10,
+    elevation: 2,
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  imageContainer:{
+    flex:0.5,
+    alignItems:'center',
+    justifyContent:'center',
+  },
+  image:{
+    width:200,
+    height:200,
+    resizeMode:'cover',
   },
 });
 

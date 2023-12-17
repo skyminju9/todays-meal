@@ -4,6 +4,7 @@ import {createPool} from 'mariadb';
 import {hash, compare} from 'bcrypt';
 import session from 'express-session';
 import path from 'path';
+import fs from 'fs';
 import {spawn} from 'child_process';
 import {fileURLToPath} from 'url';
 // import axios from 'axios';
@@ -58,6 +59,38 @@ async function getUserPreferences(userId) {
   }
 }
 
+// 마지막 추천 시각 업데이트
+async function updateLastRecommendationTime(userId) {
+  try {
+    const conn = await pool.getConnection();
+    const now = new Date();
+    await conn.query('UPDATE Users SET updateTime = ? WHERE userid = ?', [now, userId]);
+    conn.release();
+  } catch (error) {
+    console.error('Error updating last recommendation time:', error);
+    throw error;
+  }
+}
+//마지막 추천 시간 조회
+async function getLastRecommendationTime(userId) {
+  try {
+    const conn = await pool.getConnection();
+    const query = 'SELECT updateTime FROM Users WHERE userid = ?';
+    const result = await conn.query(query, [userId]);
+    conn.release();
+
+    if (result.length > 0 && result[0].lastRecommendationTime) {
+      // 데이터베이스에서 조회한 시간을 JavaScript Date 객체로 변환
+      return new Date(result[0].lastRecommendationTime);
+    } else {
+      // 추천 받은 기록이 없는 경우 null 반환
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching last recommendation time:', error);
+    throw error;
+  }
+}
 app.get('/', (req, res) => {
   res.send('Hello from the backend!'); // 루트 경로로 요청이 왔을 때 "Hello from the backend!"를 응답으로 보냅니다.
 });
@@ -294,15 +327,99 @@ app.post('/updatePushNotificationSetting', async (req, res) => {
   }
 });
 
+// Bookmark
+app.post('/bookmark', async (req, res) => {
+  const { recipeid } = req.body;
+  const userid = req.session.user && req.session.user.userid;
+
+  if (!userid) {
+    return res.status(401).json({ success: false, message: '로그인이 필요합니다' });
+  }
+
+  try {
+    const conn = await pool.getConnection();
+    await conn.query('INSERT INTO BookmarkedRecipes (userid, recipeid) VALUES (?, ?)', [userid, recipeid]);
+    conn.release();
+
+    res.status(200).json({ success: true, message: 'Bookmark added successfully' });
+  } catch (error) {
+    console.error('Error adding bookmark:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// Bookmark delete
+app.delete('/deleteBookmark/:recipeid', async (req, res) => {
+  const recipeid = req.params.recipeid;
+  const userid = req.session.user && req.session.user.userid;
+
+  if (!userid) {
+    return res.status(401).json({ success: false, message: '로그인이 필요합니다' });
+  }
+
+  try {
+    const conn = await pool.getConnection();
+    // 해당 사용자의 북마크만 삭제
+    const result = await conn.query('DELETE FROM BookmarkedRecipes WHERE recipeid = ? AND userid = ?', [recipeid, userid]);
+    conn.release();
+    
+    if (result.affectedRows === 0) {// 북마크가 없는 경우
+      res.status(404).json({ success: false, message: 'Bookmark not found' });
+    } else {// 삭제 성공
+      res.status(200).json({ success: true, message: 'Bookmark deleted successfully' });
+    }
+  } catch (error) {
+    console.error('Error deleting bookmark:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// Get bookmarks
+app.get('/getBookmarks', async (req, res) => {
+  const userid = req.session.user && req.session.user.userid;
+
+  if (!userid) {
+    return res.status(401).json({ success: false, message: '로그인이 필요합니다' });
+  }
+
+  try {
+    const conn = await pool.getConnection();
+    const bookmarks = await conn.query('SELECT recipeid FROM BookmarkedRecipes WHERE userid = ?', [userid]);
+    conn.release();
+    // recipes.json 파일 읽기
+    const recipesFilePath = path.join(__dirname, '../recipes.json');
+    const recipesData = JSON.parse(fs.readFileSync(recipesFilePath, 'utf8'));
+
+    // 북마크된 레시피 정보 찾기
+    const bookmarkedRecipes = bookmarks.map(bookmark => recipesData.find(recipe => recipe.id === bookmark.recipeid));
+
+    res.status(200).json({ success: true, bookmarks: bookmarkedRecipes });
+    } catch (error) {
+    console.error('Error fetching bookmarks:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' }); 
+}
+});
+
 // recommend
 app.post('/recommend', async (req, res) => {
   console.log('Recommendation request received:', req.body);
-  // try {
+  
   const userid = req.session.user && req.session.user.userid;
   if (!userid) {
     return res
       .status(401)
       .json({success: false, message: '로그인이 필요합니다'});
+  }
+
+  // 사용자의 마지막 추천 시간을 확인
+  const lastRecommendationTime = await getLastRecommendationTime(userid);
+  const currentTime = new Date();
+
+  // 마지막 추천 시간과 현재 시간을 비교(24시간 이내인지 확인)
+  if (lastRecommendationTime && currentTime - lastRecommendationTime < 86400000) {
+    return res
+      .status(200)
+      .json({success: true, message: '이미 오늘의 추천을 받았습니다'});
   }
 
   const userPreferences = await getUserPreferences(userid);
@@ -313,6 +430,7 @@ app.post('/recommend', async (req, res) => {
       .json({success: false, message: 'User preferences not found'});
   }
 
+  // 추천 알고리즘을 실행
   const scriptPath = path.join(__dirname, '../AI/recommend.py');
   const scriptArgs = [scriptPath, userid, JSON.stringify(userPreferences)];
 
@@ -323,13 +441,23 @@ app.post('/recommend', async (req, res) => {
     scriptOutput += data.toString();
   });
 
-  pythonProcess.on('close', code => {
+  pythonProcess.on('close', async (code) => {
     if (code !== 0) {
       return res
         .status(500)
         .json({success: false, message: 'Internal server error'});
     }
-    res.status(200).json({success: true, recommend: JSON.parse(scriptOutput)});
+    try {
+      // JSON 파싱 시도
+      const parsedOutput = JSON.parse(scriptOutput);
+      // 마지막 추천 시간을 업데이트
+      await updateLastRecommendationTime(userid);
+      res.status(200).json({success: true, recommend: parsedOutput.name});
+    } catch (error) {
+      // JSON 파싱 중 오류가 발생했을 때 처리
+      console.error('JSON 파싱 오류:', error);
+      res.status(500).json({success: false, message: 'JSON parsing error'});
+    }
   });
 });
 
