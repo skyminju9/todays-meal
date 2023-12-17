@@ -461,19 +461,14 @@ app.post('/recommend', async (req, res) => {
   });
 });
 
-/*
-const isAdmin = (req, res, next) => {
-  if (req.session.user && req.session.user.isAdmin) {
-    next();
-  } else {
-    res.status(403).json({ success: false, message: 'Unauthorized access' });
-  }
-};
+// 정적 파일을 제공하기 위한 미들웨어 설정
+app.use(express.static(path.join(__dirname, 'build')));
 
-app.get('/admin', isAdmin, (req, res) => {
-  res.send('Welcome to the admin dashboard!');
+// /todaysmeal 엔드포인트에 MainPage.js를 제공
+app.get('/todaysmeal', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
-*/
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
