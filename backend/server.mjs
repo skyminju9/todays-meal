@@ -461,12 +461,12 @@ app.post('/recommend', async (req, res) => {
   });
 });
 
-// 정적 파일을 제공하기 위한 미들웨어 설정
-app.use(express.static(path.join(__dirname, 'build')));
+// admin-dashboard/build 디렉토리를 정적 파일 제공을 위한 루트로 설정
+app.use(express.static(path.join(__dirname, 'admin-dashboard', 'build')));
 
-// /todaysmeal 엔드포인트에 MainPage.js를 제공
 app.get('/todaysmeal', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  // admin-dashboard/build 디렉토리에서 index.html 파일을 제공
+  res.sendFile(path.join(__dirname, 'admin-dashboard', 'build', 'index.html'));
 });
 
 
