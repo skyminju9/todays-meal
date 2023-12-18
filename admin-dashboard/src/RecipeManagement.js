@@ -44,7 +44,9 @@ const RecipeManagement = () => {
             <tr key={recipe.id}>
               <td>{recipe.id}</td>
               <td>{recipe.name}</td>
-              <td>{recipe.category.join(', ')}</td>
+              <td>
+                {Array.isArray(recipe.category) ? recipe.category.join(', ') : recipe.category}
+              </td>
               <td>
                 <button onClick={() => handleDelete(recipe.id)}>Delete</button>
               </td>
