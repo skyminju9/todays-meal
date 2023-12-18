@@ -5,18 +5,12 @@ import RecipeManagement from './RecipeManagement';
 const recipeManage = () => {
   const layoutStyle = {
     display: 'flex',
-    height: '100vh',
+    height: '100%',
   };
 
   const navStyle = {
     backgroundColor: '#EDF6FF',
     width: '200px',
-    padding: '20px',
-    boxSizing: 'border-box',
-  };
-
-  const contentStyle = {
-    flex: 1,
     padding: '20px',
     boxSizing: 'border-box',
   };
