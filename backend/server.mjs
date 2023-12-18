@@ -8,7 +8,6 @@ import fs from 'fs';
 import {spawn} from 'child_process';
 import {fileURLToPath} from 'url';
 import bodyParser from 'body-parser';
-import fs from 'fs';
 import cors from 'cors';
 // import axios from 'axios';
 
