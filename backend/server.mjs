@@ -484,17 +484,38 @@ app.get('/api/users', (req, res) => {
     });
 });
 
-app.delete('/api/users/:id', (req, res) => {
+app.delete('/api/users/:id', async (req, res) => {
   const userId = req.params.id;
-  const query = 'DELETE FROM Users WHERE id = ?';
-  pool.query(query, [userId])
-    .then(() => {
+
+  try {
+    const conn = await pool.getConnection();
+
+    // Start a transaction to ensure atomicity
+    await conn.beginTransaction();
+
+    try {
+      // Delete user data from UserSelections table
+      await conn.query('DELETE FROM UserSelections WHERE userid = ?', [userId]);
+
+      // Delete user data from Users table
+      await conn.query('DELETE FROM Users WHERE id = ?', [userId]);
+
+      // Commit the transaction if all queries succeed
+      await conn.commit();
+
       res.json({ message: 'User deleted successfully' });
-    })
-    .catch((error) => {
-      console.error('Error deleting user:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    });
+    } catch (error) {
+      // Rollback the transaction if any query fails
+      await conn.rollback();
+      throw error;
+    } finally {
+      // Release the connection
+      conn.release();
+    }
+  } catch (error) {
+    console.error(`Error deleting user with ID ${userId}:`, error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // 정적 파일을 제공하기 위한 미들웨어 설정
