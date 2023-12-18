@@ -15,7 +15,20 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const PORT = process.env.PORT || 60022;
-const recipes = require('./../recipes.json');
+let recipes = [];
+
+// Load recipes from the file
+async function loadRecipes() {
+  try {
+    const data = await fs.readFile('./../recipes.json', 'utf-8');
+    recipes = JSON.parse(data);
+  } catch (error) {
+    console.error('Error loading recipes:', error);
+  }
+}
+
+// Initial load of recipes
+loadRecipes();
 
 app.use(json());
 app.use(
@@ -544,7 +557,13 @@ app.get('/admin-page', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-app.post('/api/recipes/delete/:id', (req, res) => {
+// Endpoint to get all recipes
+app.get('/api/recipes', (req, res) => {
+  res.json(recipes);
+});
+
+// Endpoint to delete a recipe
+app.post('/api/recipes/delete/:id', async (req, res) => {
   const recipeId = parseInt(req.params.id);
 
   // Find the index of the recipe with the specified ID
@@ -554,17 +573,22 @@ app.post('/api/recipes/delete/:id', (req, res) => {
     // Recipe found, remove it from the array
     recipes.splice(recipeIndex, 1);
 
-    // Save the updated recipes array (you might want to write this to a file in a real application)
-    // For now, we'll just update the require statement to simulate saving
-    require('fs').writeFileSync('./../recipes.json', JSON.stringify(recipes, null, 2));
-
-    // Send a success response
-    res.json({ message: 'Recipe deleted successfully' });
+    // Save the updated recipes array
+    try {
+      await fs.writeFile('./../recipes.json', JSON.stringify(recipes, null, 2));
+      // Send a success response
+      res.json({ message: 'Recipe deleted successfully' });
+    } catch (error) {
+      console.error('Error saving recipes:', error);
+      // Send an error response
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
   } else {
-    // Recipe not found, send an error response
+    // Recipe not found, send a 404 error response
     res.status(404).json({ error: 'Recipe not found' });
   }
 });
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
