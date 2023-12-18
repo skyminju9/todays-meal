@@ -85,7 +85,9 @@ const MainPage = () => {
             <p style={{ paddingLeft:'50px', fontSize: 15, paddingBottom: '20px' }}>② 푸시 알림을 클릭하면 앱으로 이동해 추천 메뉴의 레시피를 볼 수 있어요.</p>
             <p style={{ paddingLeft:'50px', fontSize: 15, paddingBottom: '20px' }}>③ 메뉴가 마음에 들지 않을 때는 다시 추천받을 수 있어요.</p>
             <div style={buttonContainerStyle}>
-              <button style={buttonStyle}>Download App</button>
+              <Link to = "https://drive.google.com/file/d/12u92RQ9EY5pQuWQ3POfgYNqewCs8AphC/view?usp=sharing">
+                <button style={buttonStyle}>Download App</button>
+              </Link>
             </div>
             
           </div>
