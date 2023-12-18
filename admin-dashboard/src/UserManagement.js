@@ -47,25 +47,25 @@ const UserManagement = () => {
       <table>
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>User ID</th>
-            <th>Push Notification Setting</th>
-            <th>Action</th>
+            <th style={{ padding: '2px' }}>ID</th>
+            <th style={{ padding: '2px' }}>Name</th>
+            <th style={{ padding: '2px' }}>User ID</th>
+            <th style={{ padding: '2px' }}>Push Notification Setting</th>
+            <th style={{ padding: '2px' }}>Action</th>
           </tr>
         </thead>
         <tbody>
           {userList.map(user => (
             <tr key={user.id}>
-              <td>{user.id}</td>
-              <td>{user.name}</td>
-              <td>{user.userid}</td>
-              <td>{user.pushNotificationSetting ? 'Enabled' : 'Disabled'}</td>
-              <td>
+              <td style={{ padding: '2px' }}>{user.id}</td>
+              <td style={{ padding: '2px' }}>{user.name}</td>
+              <td style={{ padding: '2px' }}>{user.userid}</td>
+              <td style={{ padding: '2px' }}>{user.pushNotificationSetting ? 'Enabled' : 'Disabled'}</td>
+              <td style={{ padding: '2px' }}>
                 {/* Add a button to view user details */}
                 <button style={buttonstyle}>View</button>
                 {/* Add a button to delete user */}
-                <button style={buttonstyle}>Delete</button>
+                <button style={buttonstyle} onClick={() => handleDeleteUser(user.id)}>Delete</button>
               </td>
             </tr>
           ))}

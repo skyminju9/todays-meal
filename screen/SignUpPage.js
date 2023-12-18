@@ -136,6 +136,7 @@ const styles = StyleSheet.create({
 
     },
     title:{
+        
         color:'black',
         fontSize:30,
         fontWeight:'900',
@@ -211,9 +212,9 @@ const styles = StyleSheet.create({
         bottom:60,
         //left:0,
         alignSelf:'center',
-        width:270,
+        width:300,
         color:'black',
-    },
+      },
     button:{
         position:'absolute',
         bottom:60,
