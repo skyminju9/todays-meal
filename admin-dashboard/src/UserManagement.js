@@ -65,7 +65,7 @@ const UserManagement = () => {
                 {/* Add a button to view user details */}
                 <button style={buttonstyle}>View</button>
                 {/* Add a button to delete user */}
-                <button style={buttonstyle}>Delete</button>
+                <button style={buttonstyle} onClick={() => handleDeleteUser(user.id)}>Delete</button>
               </td>
             </tr>
           ))}
