@@ -6,7 +6,7 @@ const RecipeManagement = () => {
 
   useEffect(() => {
     // Fetch recipes from the server
-    axios.get('http://localhost:3001/recipes')
+    axios.get('http://ceprj.gachon.ac.kr:60022/admin-recipe')
       .then(response => {
         setRecipes(response.data);
       })
@@ -17,7 +17,7 @@ const RecipeManagement = () => {
 
   const handleDelete = (id) => {
     // Delete recipe with the given id using a POST request
-    axios.post('http://localhost:3001/recipes/delete', { id })
+    axios.post('http://ceprj.gachon.ac.kr:60022/admin-recipe/delete', { id })
       .then(response => {
         // Update the recipes state after successful deletion
         setRecipes(recipes.filter(recipe => recipe.id !== id));

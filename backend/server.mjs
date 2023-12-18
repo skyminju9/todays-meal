@@ -555,12 +555,12 @@ const writeRecipes = (recipes) => {
   fs.writeFileSync('../recipes.json', JSON.stringify(recipes, null, 2));
 };
 
-app.get('/recipes', (req, res) => {
+app.get('/admin-recipe', (req, res) => {
   const recipes = readRecipes();
   res.json(recipes);
 });
 
-app.post('/recipes/delete', (req, res) => {
+app.post('/admin-recipe/delete', (req, res) => {
   const idToDelete = parseInt(req.body.id);
   const recipes = readRecipes();
   const updatedRecipes = recipes.filter(recipe => recipe.id !== idToDelete);
