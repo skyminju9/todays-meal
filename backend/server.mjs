@@ -484,7 +484,7 @@ app.get('/api/users', (req, res) => {
     });
 });
 
-app.delete('/api/users/:id', async (req, res) => {
+app.post('/api/users/:id/delete', async (req, res) => {
   const userId = req.params.id;
 
   try {
