@@ -17,19 +17,6 @@ const app = express();
 const PORT = process.env.PORT || 60022;
 let recipes = [];
 
-// Load recipes from the file
-async function loadRecipes() {
-  try {
-    const data = await fs.readFile('./../recipes.json', 'utf-8');
-    recipes = JSON.parse(data);
-  } catch (error) {
-    console.error('Error loading recipes:', error);
-  }
-}
-
-// Initial load of recipes
-loadRecipes();
-
 app.use(json());
 app.use(
   session({
@@ -557,38 +544,29 @@ app.get('/admin-page', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-// Endpoint to get all recipes
-app.get('/api/recipes', (req, res) => {
+// Read recipes from the JSON file
+const readRecipes = () => {
+  const recipesData = fs.readFileSync('../recipes.json');
+  return JSON.parse(recipesData);
+};
+
+// Write recipes to the JSON file
+const writeRecipes = (recipes) => {
+  fs.writeFileSync('../recipes.json', JSON.stringify(recipes, null, 2));
+};
+
+app.get('/recipes', (req, res) => {
+  const recipes = readRecipes();
   res.json(recipes);
 });
 
-// Endpoint to delete a recipe
-app.post('/api/recipes/delete/:id', async (req, res) => {
-  const recipeId = parseInt(req.params.id);
-
-  // Find the index of the recipe with the specified ID
-  const recipeIndex = recipes.findIndex((recipe) => recipe.id === recipeId);
-
-  if (recipeIndex !== -1) {
-    // Recipe found, remove it from the array
-    recipes.splice(recipeIndex, 1);
-
-    // Save the updated recipes array
-    try {
-      await fs.writeFile('./../recipes.json', JSON.stringify(recipes, null, 2));
-      // Send a success response
-      res.json({ message: 'Recipe deleted successfully' });
-    } catch (error) {
-      console.error('Error saving recipes:', error);
-      // Send an error response
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  } else {
-    // Recipe not found, send a 404 error response
-    res.status(404).json({ error: 'Recipe not found' });
-  }
+app.post('/recipes/delete', (req, res) => {
+  const idToDelete = parseInt(req.body.id);
+  const recipes = readRecipes();
+  const updatedRecipes = recipes.filter(recipe => recipe.id !== idToDelete);
+  writeRecipes(updatedRecipes);
+  res.json({ success: true });
 });
-
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
