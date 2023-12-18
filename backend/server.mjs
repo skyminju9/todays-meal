@@ -556,7 +556,7 @@ const readRecipeData = () => {
 // Write recipe data to the JSON file
 const writeRecipeData = (data) => {
   try {
-    fs.writeFileSync('../recipes.json', JSON.stringify(data, null, 2));
+    fs.writeFileSync(`${__dirname}/../recipes.json`, JSON.stringify(data, null, 2));
   } catch (error) {
     console.error('Error writing recipe data:', error);
   }
