@@ -15,6 +15,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const PORT = process.env.PORT || 60022;
+const recipes = require('./../recipes.json');
 
 app.use(json());
 app.use(
@@ -543,38 +544,26 @@ app.get('/admin-page', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-const readRecipeData = () => {
-  try {
-    const rawData = fs.readFileSync('../recipes.json');
-    return JSON.parse(rawData);
-  } catch (error) {
-    console.error('Error reading recipe data:', error);
-    return [];
-  }
-};
-
-// Write recipe data to the JSON file
-const writeRecipeData = (data) => {
-  try {
-    fs.writeFileSync(`${__dirname}/../recipes.json`, JSON.stringify(data, null, 2));
-  } catch (error) {
-    console.error('Error writing recipe data:', error);
-  }
-};
-
-// Endpoint to get all recipes
-app.get('/api/recipes', (req, res) => {
-  const recipes = readRecipeData();
-  res.json(recipes);
-});
-
-// Endpoint to delete a recipe by ID
 app.post('/api/recipes/delete/:id', (req, res) => {
-  const { id } = req.params;
-  const recipes = readRecipeData();
-  const updatedRecipes = recipes.filter(recipe => recipe.id !== parseInt(id, 10));
-  writeRecipeData(updatedRecipes);
-  res.sendStatus(200);
+  const recipeId = parseInt(req.params.id);
+
+  // Find the index of the recipe with the specified ID
+  const recipeIndex = recipes.findIndex((recipe) => recipe.id === recipeId);
+
+  if (recipeIndex !== -1) {
+    // Recipe found, remove it from the array
+    recipes.splice(recipeIndex, 1);
+
+    // Save the updated recipes array (you might want to write this to a file in a real application)
+    // For now, we'll just update the require statement to simulate saving
+    require('fs').writeFileSync('./../recipes.json', JSON.stringify(recipes, null, 2));
+
+    // Send a success response
+    res.json({ message: 'Recipe deleted successfully' });
+  } else {
+    // Recipe not found, send an error response
+    res.status(404).json({ error: 'Recipe not found' });
+  }
 });
 
 app.listen(PORT, () => {
