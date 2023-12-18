@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import RecipeManagement from './RecipeManagement';
 
 const recipeManage = () => {
   const layoutStyle = {
@@ -61,6 +62,9 @@ const recipeManage = () => {
           </li>
         </ul>
       </nav>
+      <div>
+        <RecipeManagement/>
+      </div>
     </div>
   );
 };

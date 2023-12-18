@@ -7,6 +7,8 @@ import path from 'path';
 import fs from 'fs';
 import {spawn} from 'child_process';
 import {fileURLToPath} from 'url';
+import bodyParser from 'body-parser';
+import fs from 'fs';
 import cors from 'cors';
 // import axios from 'axios';
 
@@ -24,7 +26,7 @@ app.use(
     cookie: {secure: false, maxAge: 1000 * 60 * 60 * 24},
   }),
 );
-
+app.use(bodyParser.json());
 app.use(cors());
 
 // Database connection pool setup
@@ -540,6 +542,40 @@ app.post('/api/admin-login', (req, res) => {
 
 app.get('/admin-page', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
+const readRecipeData = () => {
+  try {
+    const rawData = fs.readFileSync('./recipes.json');
+    return JSON.parse(rawData);
+  } catch (error) {
+    console.error('Error reading recipe data:', error);
+    return [];
+  }
+};
+
+// Write recipe data to the JSON file
+const writeRecipeData = (data) => {
+  try {
+    fs.writeFileSync('./recipes.json', JSON.stringify(data, null, 2));
+  } catch (error) {
+    console.error('Error writing recipe data:', error);
+  }
+};
+
+// Endpoint to get all recipes
+app.get('/api/recipes', (req, res) => {
+  const recipes = readRecipeData();
+  res.json(recipes);
+});
+
+// Endpoint to delete a recipe by ID
+app.post('/api/recipes/delete/:id', (req, res) => {
+  const { id } = req.params;
+  const recipes = readRecipeData();
+  const updatedRecipes = recipes.filter(recipe => recipe.id !== parseInt(id, 10));
+  writeRecipeData(updatedRecipes);
+  res.sendStatus(200);
 });
 
 app.listen(PORT, () => {
