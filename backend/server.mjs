@@ -545,7 +545,7 @@ app.get('/admin-page', (req, res) => {
 
 const readRecipeData = () => {
   try {
-    const rawData = fs.readFileSync('./recipes.json');
+    const rawData = fs.readFileSync('../recipes.json');
     return JSON.parse(rawData);
   } catch (error) {
     console.error('Error reading recipe data:', error);
@@ -556,7 +556,7 @@ const readRecipeData = () => {
 // Write recipe data to the JSON file
 const writeRecipeData = (data) => {
   try {
-    fs.writeFileSync('./recipes.json', JSON.stringify(data, null, 2));
+    fs.writeFileSync('../recipes.json', JSON.stringify(data, null, 2));
   } catch (error) {
     console.error('Error writing recipe data:', error);
   }
