@@ -18,9 +18,9 @@ const UserManagement = () => {
   };
 
   const handleDeleteUser = (userId) => {
-    // Send a DELETE request to the server to delete the user
-    fetch(`http://ceprj.gachon.ac.kr:60022/api/users/${userId}`, {
-      method: 'DELETE',
+    // Send a POST request to the server to delete the user
+    fetch(`http://ceprj.gachon.ac.kr:60022/api/users/${userId}/delete`, {
+      method: 'POST',
     })
       .then(response => {
         if (response.ok) {
