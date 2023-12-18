@@ -196,13 +196,13 @@ const styles = StyleSheet.create({
         alignItems:'flex-end',
         
     },
-    button:{
-
-        alignSelf:'center',
-        paddingVertical:15,
-        paddingHorizontal:100,
-        borderRadius:10,
-        backgroundColor:'#EDF6FF',
+    buttonContainer:{
+      position:'absolute',
+      bottom:60,
+      //left:0,
+      alignSelf:'center',
+      width:300,
+      color:'black',
     },
     buttonText:{
 
